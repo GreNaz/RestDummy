@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="webjars/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="/style.css" rel="stylesheet"/>
+    <title>Изменить значение задержки</title>
+</head>
+
+<body>
+<div class="delay-table">
+    <form action="#" th:action="@{/delay/save}" th:object="${form}  ">
+        <table class="table-primary">
+            <thead>
+            <tr>
+                <td>Сервис</td>
+                <td>Задержка в мс</td>
+                <td>Timeout в мс</td>
+                <td>Доступность</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="service, itemStat : ${form.viewData}">
+                <!--    || нужны для заключения в текст выражения без литералов по сути на бек передается viewData[0].name,
+                        чтобы разделить каждый input и вернуть обратно-->
+                <td>
+                    <input hidden="hidden" th:name="|viewData[${itemStat.index}].name|"
+                           th:value="${service.getName()}"/>
+                    <span th:text="${service.getName()}"/>
+                </td>
+                <td>
+                    <input type="number" id="form12" class="form-control" min="0"
+                           th:name="|viewData[${itemStat.index}].delay|"
+                           th:value="${service.getDelay()}"/>
+                </td>
+                <td>
+                    <input hidden="hidden" th:name="|viewData[${itemStat.index}].timeout|"
+                           th:value="${service.getTimeout()}"/>
+                    <span th:text="${service.getTimeout()}"/>
+                </td>
+                <td>
+                    <input type="checkbox" th:name="|viewData[${itemStat.index}].isAvailable|"
+                           th:checked="${service.getIsAvailable()}"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="div-btn-submit">
+            <input class="buttonPink" type="submit"/>
+        </div>
+    </form>
+</div>
+</body>
+</html>

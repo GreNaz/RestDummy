@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Пробуем:)</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="webjars/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="/style.css" rel="stylesheet"/>
+    <!--    https://mdbootstrap.com/docs/standard/layout/columns/    -->
+</head>
+<body class="py-4">
+<div class="delay-table">
+    <table class="table-primary">
+        <thead>
+        <tr>
+            <td>Сервис</td>
+            <td>Задержка в мс</td>
+            <td>Timeout в мс</td>
+            <td>Доступность</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="service, itemStat : ${form.viewData}">
+            <td><span th:text="${service.name}">Сервис</span></td>
+            <td><span th:text="${service.delay}">Задержка в мс</span></td>
+            <td><span th:text="${service.timeout}">Timeout в мс</span></td>
+            <td><span th:text="${service.isAvailable}">Доступность</span></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="div-btn">
+        <input value="Изменить" type="button" onclick="location.href='/delay/edit'" class="buttonPink"/>
+        <input value="-10%" type="button" onclick="location.href='/delay/calculate'" class="buttonPink"/>
+        <input value="Дефолтные" type="button" onclick="location.href='/delay/default'" class="buttonPink"/>
+        <input value="Выкл сервисы" type="button" onclick="location.href='/delay/disableServices'" class="buttonPink"/>
+        <input value="Вкл сервисы" type="button" onclick="location.href='/delay/enableServices'" class="buttonPink"/>
+    </div>
+</div>
+</body>
+</html>
