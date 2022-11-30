@@ -1,20 +1,16 @@
 package com.LT.restDummy.stub.controller;
 
-import com.LT.restDummy.availability.model.AvailabilityServiceValue;
-import com.LT.restDummy.delay.model.DelayValue;
-import com.LT.restDummy.delay.service.ResponseDelay;
 import com.LT.restDummy.stub.helper.DummyHelper;
 import com.LT.restDummy.stub.service.CustomerSurvey;
 import com.LT.restDummy.stub.service.ExampleService;
-import com.LT.restDummy.stub.service.ExampleService2;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -60,6 +56,12 @@ public class RestDummyController {
 //    public RestDummyController(AvailabilityServiceValue availabilityServiceValue) {
 //        this.availabilityServiceValue = availabilityServiceValue;
 //
+//    }
+
+//    @GetMapping("/scheduler")
+//    public String scheduler() {
+//        DummyHelper.scheduler();
+//        return "success";
 //    }
 
     @Async("fixedThreads")

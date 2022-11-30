@@ -18,6 +18,7 @@
             <td>Задержка в мс</td>
             <td>Timeout в мс</td>
             <td>Доступность</td>
+            <td>Scheduler</td>
         </tr>
         </thead>
         <tbody>
@@ -26,6 +27,7 @@
             <td><span th:text="${service.delay}">Задержка в мс</span></td>
             <td><span th:text="${service.timeout}">Timeout в мс</span></td>
             <td><span th:text="${service.isAvailable}">Доступность</span></td>
+            <td><span th:text="${service.scheduler}">Scheduler</span></td>
         </tr>
         </tbody>
     </table>
