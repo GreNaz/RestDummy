@@ -1,4 +1,4 @@
-package com.LT.restDummy.stub.exception;
+package com.LT.restDummy.exception;
 
 public class ServiceException extends RuntimeException {
     public ServiceException(String message) {

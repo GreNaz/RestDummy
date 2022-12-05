@@ -1,4 +1,4 @@
-package com.LT.restDummy.stub.exception;
+package com.LT.restDummy.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -18,10 +18,12 @@
             <thead>
             <tr>
                 <td>Сервис</td>
-                <td>Задержка в мс</td>
+                <td>текущая задержка в мс</td>
                 <td>Timeout в мс</td>
+                <td>Задержка для Scheduler</td>
+                <td>Scheduler Delay</td>
                 <td>Доступность</td>
-                <td>Scheduler</td>
+                <td>Scheduler выключения</td>
             </tr>
             </thead>
             <tbody>
@@ -35,8 +37,8 @@
                 </td>
                 <td>
                     <input type="number" id="form12" class="form-control" min="0"
-                           th:name="|viewData[${itemStat.index}].delay|"
-                           th:value="${service.getDelay()}"/>
+                           th:name="|viewData[${itemStat.index}].currentDelay|"
+                           th:value="${service.getCurrentDelay()}"/>
                 </td>
                 <td>
                     <input hidden="hidden" th:name="|viewData[${itemStat.index}].timeout|"
@@ -44,13 +46,23 @@
                     <span th:text="${service.getTimeout()}"/>
                 </td>
                 <td>
+                    <input type="number" class="form-control" min="0"
+                           th:name="|viewData[${itemStat.index}].delayForScheduler|"
+                           th:value="${service.getDelayForScheduler()}"/>
+                </td>
+                <td>
+                    <input type="text"  class="form-control date-format" min="0"
+                           th:name="|viewData[${itemStat.index}].schedulerDelay|"
+                           th:value="${service.getSchedulerDelay()}"/>
+                </td>
+                <td>
                     <input type="checkbox" th:name="|viewData[${itemStat.index}].isAvailable|"
                            th:checked="${service.getIsAvailable()}"/>
                 </td>
                 <td>
-                    <input type="text" id="form13" class="form-control date-format" min="0"
-                           th:name="|viewData[${itemStat.index}].scheduler|"
-                           th:value="${service.getScheduler()}"/>
+                    <input type="text"  class="form-control date-format" min="0"
+                           th:name="|viewData[${itemStat.index}].schedulerAvailability|"
+                           th:value="${service.getSchedulerAvailability()}"/>
                 </td>
             </tr>
             </tbody>

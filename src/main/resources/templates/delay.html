@@ -15,19 +15,21 @@
         <thead>
         <tr>
             <td>Сервис</td>
-            <td>Задержка в мс</td>
-            <td>Timeout в мс</td>
-            <td>Доступность</td>
-            <td>Scheduler</td>
+            <td>Задержка в ms</td>
+            <td>Timeout в ms</td>
+            <td>Scheduler Delay</td>
+            <td>Доступность сервиса</td>
+            <td>Scheduler выключения</td>
         </tr>
         </thead>
         <tbody>
         <tr th:each="service, itemStat : ${form.viewData}">
             <td><span th:text="${service.name}">Сервис</span></td>
-            <td><span th:text="${service.delay}">Задержка в мс</span></td>
+            <td><span th:text="${service.getCurrentDelay}">Задержка в мс</span></td>
             <td><span th:text="${service.timeout}">Timeout в мс</span></td>
+            <td><span th:text="${service.schedulerDelay}">Scheduler</span></td>
             <td><span th:text="${service.isAvailable}">Доступность</span></td>
-            <td><span th:text="${service.scheduler}">Scheduler</span></td>
+            <td><span th:text="${service.schedulerAvailability}">Scheduler</span></td>
         </tr>
         </tbody>
     </table>

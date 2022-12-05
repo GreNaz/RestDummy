@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import java.io.*;
-import java.net.URL;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Properties;
@@ -17,67 +18,66 @@ import java.util.Properties;
 @PropertySource("classpath:delay.properties")
 @Slf4j
 public class PropertyBeen {
+
     //     инициализация бина для задержки
     @Bean("Custom_delay")
     public DelayValue delay() {
         HashMap<String, Long> service_delay = new HashMap<>();
         HashMap<String, Long> service_timeout = new HashMap<>();
+        HashMap<String, LocalDateTime> service_scheduler = new HashMap<>();
+        Properties propertiesDelay = new Properties();
+        Properties propertiesTimeout = new Properties();
 
-
-
-//        FileResourcesUtils app = new FileResourcesUtils();
-
+//        считывание из файла параметров задержки и таймаута
         try {
-            Properties propertiesDelay = new Properties();
-            Properties propertiesTimeout = new Properties();
-//            TODO почему на сервере не работает?
-            propertiesDelay.load(new FileReader(this.getClass().getClassLoader().getResource("delay.properties").getPath()));
-//            String uriClass = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-//            propertiesDelay.load(new FileReader(uriClass+"/delay.properties"));
-
-//
-
-
-            propertiesTimeout.load(new FileReader(this.getClass().getClassLoader().getResource("timeout.properties").getPath()));
-//            propertiesTimeout.load(new FileReader(uriClass+"/timeout.properties"));
-
-            for (String key : propertiesDelay.stringPropertyNames()) {
-                service_delay.put(key, Long.valueOf(propertiesDelay.getProperty(key)));
-                if (propertiesTimeout.containsKey(key)) {
-                    service_timeout.put(key, Long.valueOf(propertiesTimeout.getProperty(key)));
-                }
+            InputStream inputDelay = this.getClass().getClassLoader().getResourceAsStream("delay.properties");
+            InputStream inputTimeout = this.getClass().getClassLoader().getResourceAsStream("timeout.properties");
+            if (inputDelay == null || inputTimeout == null) {
+                System.out.println("Sorry, unable to find .properties");
             }
-//            TODO добавить отлов нулпоинтера
+            propertiesDelay.load(inputDelay);
+            propertiesTimeout.load(inputTimeout);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return DelayValue.getInstance().initialize(service_delay, service_timeout);
 
+//          формирование мапы для передачи в класс DelayValue
+        for (String key : propertiesDelay.stringPropertyNames()) {
+            service_delay.put(key, Long.valueOf(propertiesDelay.getProperty(key)));
+            if (propertiesTimeout.containsKey(key)) {
+                service_timeout.put(key, Long.valueOf(propertiesTimeout.getProperty(key)));
+            }
+        }
+
+        return DelayValue.getInstance().initialize(service_delay, service_timeout, service_scheduler);
     }
-
 
     //     инициализация бина для доступности сервисов
     @Bean("Availability")
     public AvailabilityServiceValue availability() {
         HashMap<String, Boolean> service_availability = new HashMap<>();
         HashMap<String, LocalDateTime> service_scheduler = new HashMap<>();
-        try {
-            Properties properties = new Properties();
-//            String uriClass = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-//            properties.load(new FileReader(uriClass+"/delay.properties"));
+        Properties properties = new Properties();
 
-            properties.load(new FileReader(this.getClass().getClassLoader().getResource("delay.properties").getPath()));
-            for (String key : properties.stringPropertyNames()) {
-                service_availability.put(key, true);
-            }
+//      считывание из файла параметров задержки и таймаута
+        try {
+            InputStream inputDelay = this.getClass().getClassLoader().getResourceAsStream("delay.properties");
+            properties.load(inputDelay);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //          формирование мапы для передачи в класс DelayValue
+        for (String key : properties.stringPropertyNames()) {
+            service_availability.put(key, true);
+        }
         return AvailabilityServiceValue.getInstance().initialize(service_availability, service_scheduler);
     }
+
+
 
 }
