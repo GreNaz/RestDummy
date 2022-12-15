@@ -7,19 +7,18 @@
     <link href="webjars/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="/bootstrap-icons.css" rel="stylesheet"/>
     <link href="/style.css" rel="stylesheet"/>
-    <!--    https://mdbootstrap.com/docs/standard/layout/columns/    -->
 </head>
 <body class="py-4">
 <div class="delay-table">
-    <table class="table-primary">
-        <thead>
+    <table class="table">
+        <thead class="thead-dark">
         <tr>
-            <td>Сервис</td>
-            <td>Задержка в ms</td>
-            <td>Timeout в ms</td>
-            <td>Scheduler Delay</td>
-            <td>Доступность сервиса</td>
-            <td>Scheduler выключения</td>
+            <th>Сервис</th>
+            <th>Задержка в ms</th>
+            <th>Timeout в ms</th>
+            <th>Scheduler Delay</th>
+            <th>Доступность сервиса</th>
+            <th>Scheduler выключения</th>
         </tr>
         </thead>
         <tbody>
@@ -34,11 +33,12 @@
         </tbody>
     </table>
     <div class="div-btn">
-        <input value="Изменить" type="button" onclick="location.href='/delay/edit'" class="buttonPink"/>
-        <input value="-10%" type="button" onclick="location.href='/delay/calculate'" class="buttonPink"/>
-        <input value="Дефолтные" type="button" onclick="location.href='/delay/default'" class="buttonPink"/>
-        <input value="Выкл сервисы" type="button" onclick="location.href='/delay/disableServices'" class="buttonPink"/>
-        <input value="Вкл сервисы" type="button" onclick="location.href='/delay/enableServices'" class="buttonPink"/>
+        <input value="Изменить" type="button" onclick="location.href='/delay/edit'" class="buttonBlack"/>
+        <input value="Добавить сервис" type="button" onclick="location.href='/services/add'" class="buttonBlack"/>
+        <input value="-10%" type="button" onclick="location.href='/delay/calculate'" class="buttonBlack"/>
+        <input value="Дефолтные" type="button" onclick="location.href='/delay/default'" class="buttonBlack"/>
+        <input value="Выкл сервисы" type="button" onclick="location.href='/delay/disableServices'" class="buttonBlack"/>
+        <input value="Вкл сервисы" type="button" onclick="location.href='/delay/enableServices'" class="buttonBlack"/>
     </div>
 </div>
 </body>

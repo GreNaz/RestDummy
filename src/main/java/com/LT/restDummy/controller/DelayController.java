@@ -1,10 +1,13 @@
-package com.LT.restDummy.delay.controller;
+package com.LT.restDummy.controller;
 
 
-import com.LT.restDummy.availability.model.AvailabilityServiceValue;
+import com.LT.restDummy.availability.model.AvailabilityValue;
 import com.LT.restDummy.delay.model.DelayValue;
 import com.LT.restDummy.delay.model.ViewDelayData;
 import com.LT.restDummy.delay.model.ViewDelayDataDTO;
+import com.LT.restDummy.file.FileWork;
+import com.LT.restDummy.servises.ServiceValue;
+import com.LT.restDummy.servises.ViewServiceData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,19 +22,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*Класс взаимодействует с фронтом(html) и управляет задержкой и доступностью сервисов*/
-
-
 @Slf4j
 @Controller
 public class DelayController {
     protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     private final DelayValue delayValue;
-    private final AvailabilityServiceValue availabilityServiceValue;
+    private final AvailabilityValue availabilityValue;
+    private final ServiceValue serviceValue;
 
     @Autowired
-    public DelayController(DelayValue delayValue, AvailabilityServiceValue availabilityServiceValue) {
+    public DelayController(DelayValue delayValue, AvailabilityValue availabilityValue, ServiceValue serviceValue) {
         this.delayValue = delayValue;
-        this.availabilityServiceValue = availabilityServiceValue;
+        this.availabilityValue = availabilityValue;
+        this.serviceValue = serviceValue;
     }
 
     //  страница с информацией по доступности сервиса, задержке и таймаутам
@@ -56,8 +59,8 @@ public class DelayController {
             delayValue.setNewDelayToScheduler(service.getName(), service.getDelayForScheduler());
 
             delayValue.setSchedulerToService(service.getName(), LocalDateTime.parse(service.getSchedulerDelay(), DATE_TIME_FORMATTER));
-            availabilityServiceValue.setAvailabilityToService(service.getName(), service.getIsAvailable());
-            availabilityServiceValue.setSchedulerToService(service.getName(), LocalDateTime.parse(service.getSchedulerAvailability(), DATE_TIME_FORMATTER));
+            availabilityValue.setAvailabilityToService(service.getName(), service.getIsAvailable());
+            availabilityValue.setSchedulerToService(service.getName(), LocalDateTime.parse(service.getSchedulerAvailability(), DATE_TIME_FORMATTER));
         }
         return "redirect:/delay";
     }
@@ -79,14 +82,40 @@ public class DelayController {
     //    включить все сервисы
     @RequestMapping("/delay/enableServices")
     public String enableServices() {
-        AvailabilityServiceValue.getInstance().initialize(true);
+        AvailabilityValue.getInstance().initialize(true);
         return "redirect:/delay";
     }
 
     //    выключить все сервисы
     @RequestMapping("/delay/disableServices")
     public String disableServices() {
-        AvailabilityServiceValue.getInstance().initialize(false);
+        AvailabilityValue.getInstance().initialize(false);
+        return "redirect:/delay";
+    }
+
+    @RequestMapping("/services/add")
+    public String addService(Model model) {
+        ViewServiceData viewServiceData = new ViewServiceData("", "");
+        model.addAttribute("viewServiceData", viewServiceData);
+        return "newServices";
+    }
+
+    @RequestMapping(value = "/services/save")
+    public String saveAddForm(@ModelAttribute(name = "viewServiceData") ViewServiceData viewData, Model model) {
+        String endpoint = FileWork.getContentEndPoint(viewData.getContent());
+        FileWork.fullFile(viewData.getServiceName(), viewData.getContent());
+        if (endpoint == null) {
+            endpoint = viewData.getServiceName();
+        }
+        serviceValue.setResponseByService(endpoint,
+                FileWork.getContentResponse(viewData.getContent()));
+        serviceValue.setTypeByService(endpoint,
+                FileWork.getContentType(viewData.getContent()));
+        delayValue.setNewService(endpoint,
+                FileWork.getContentDelay(viewData.getContent()),
+                FileWork.getContentTimeout(viewData.getContent()));
+        availabilityValue.setAvailabilityToService(endpoint, true);
+        availabilityValue.setDefaultSchedulerAvailability(endpoint);
         return "redirect:/delay";
     }
 
@@ -100,8 +129,8 @@ public class DelayController {
                     delayValue.getTimeoutByService(item),
                     delayValue.getSchedulerDelayByService(item),
                     delayValue.getSchedulerByService(item).format(DATE_TIME_FORMATTER),
-                    availabilityServiceValue.getAvailabilityByService(item),
-                    availabilityServiceValue.getSchedulerByService(item).format(DATE_TIME_FORMATTER)));
+                    availabilityValue.getAvailabilityByService(item),
+                    availabilityValue.getSchedulerByService(item).format(DATE_TIME_FORMATTER)));
         }
         for (ViewDelayData item : dataList) {
             form.addViewDelayData(item);

@@ -4,25 +4,29 @@ package com.LT.restDummy.delay.model;
 
 //import com.sun.istack.internal.NotNull;
 
+import com.LT.restDummy.exception.IncorrectParameterException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-/*Класс отвечает за взаимодействие контроллера с задержками delay.properties*/
+/*Класс отвечает за взаимодействие контроллера с задержками*/
 
 @Slf4j
 public class DelayValue {
-//    Для возвращения дефолтных задержек, неизменяемое поле
+    //    Для возвращения дефолтных задержек, неизменяемое поле
     private static final ConcurrentHashMap<String, Long> servicesDefaultDelay = new ConcurrentHashMap<>();
-//    текущая задержка
+    //    текущая задержка
     private static final ConcurrentHashMap<String, Long> currentDelay = new ConcurrentHashMap<>();
-//    таймауты сервисов
+    //    таймауты сервисов
     private static final ConcurrentHashMap<String, Long> servicesTimeout = new ConcurrentHashMap<>();
-//    время в которое будет выставлена новая задержка
+    //    время в которое будет выставлена новая задержка
     private static final ConcurrentHashMap<String, LocalDateTime> servicesScheduler = new ConcurrentHashMap<>();
-//    задержка, которая будет выставлена во время работы шедулера
+    //    задержка, которая будет выставлена во время работы шедулера
     private static final ConcurrentHashMap<String, Long> schedulerDelays = new ConcurrentHashMap<>();
 
 
@@ -37,48 +41,43 @@ public class DelayValue {
     public DelayValue initialize(HashMap<String, Long> delays, HashMap<String, Long> timeouts, HashMap<String, LocalDateTime> schedulers) {
 //        инициализация задержек сервисов и шедулера
         for (Map.Entry<String, Long> entry : delays.entrySet()) {
-            currentDelay.put(entry.getKey().toLowerCase(), entry.getValue());
-            servicesDefaultDelay.put(entry.getKey().toLowerCase(), entry.getValue());
+            currentDelay.put(entry.getKey(), entry.getValue());
+            servicesDefaultDelay.put(entry.getKey(), entry.getValue());
         }
 //                инициализация таймаутов сервисов
-        for (Map.Entry<String, Long> timeout : timeouts.entrySet()) {
-            servicesTimeout.put(timeout.getKey().toLowerCase(), timeout.getValue());
-        }
-        ConcurrentHashMap<String, Long> calc10Delay =  calculateMinus10PercentDelay();
-        for (Map.Entry<String, Long> entry : delays.entrySet()){
-            servicesScheduler.put(entry.getKey().toLowerCase(Locale.ROOT),
+        servicesTimeout.putAll(timeouts);
+        ConcurrentHashMap<String, Long> calc10Delay = calculateMinus10PercentDelay();
+        for (Map.Entry<String, Long> entry : delays.entrySet()) {
+            servicesScheduler.put(entry.getKey(),
                     schedulers.getOrDefault(
-                            entry.getKey().toLowerCase(Locale.ROOT),
+                            entry.getKey(),
                             LocalDateTime.of(2000, 01, 01, 01, 01)));
-            schedulerDelays.put(entry.getKey().toLowerCase(Locale.ROOT), calc10Delay.get(entry.getKey().toLowerCase(Locale.ROOT)));
+            schedulerDelays.put(entry.getKey(), calc10Delay.get(entry.getKey()));
         }
-
 
         return this;
     }
 
     public DelayValue initialize(ConcurrentHashMap<String, Long> delays) {
         for (Map.Entry<String, Long> delay : delays.entrySet()) {
-            currentDelay.put(delay.getKey().toLowerCase(), delay.getValue());
-            servicesDefaultDelay.put(delay.getKey().toLowerCase(), delay.getValue());
+            currentDelay.put(delay.getKey(), delay.getValue());
+            servicesDefaultDelay.put(delay.getKey(), delay.getValue());
         }
         return this;
     }
 
     public DelayValue initializeWithoutDefault(ConcurrentHashMap<String, Long> delays) {
-        for (Map.Entry<String, Long> delay : delays.entrySet()) {
-            currentDelay.put(delay.getKey().toLowerCase(), delay.getValue());
-        }
+        currentDelay.putAll(delays);
         return this;
     }
 
 
     public long getDelayByService(@NonNull String nameOfService) {
-        return currentDelay.getOrDefault(nameOfService.toLowerCase(), 1000L);
+        return currentDelay.getOrDefault(nameOfService, 1000L);
     }
 
     public long getTimeoutByService(@NonNull String nameOfService) {
-        return servicesTimeout.getOrDefault(nameOfService.toLowerCase(), 0L);
+        return servicesTimeout.getOrDefault(nameOfService, 0L);
     }
 
     public List<String> getServices() {
@@ -90,17 +89,25 @@ public class DelayValue {
     }
 
     public void setNewDelayToService(@NonNull String nameOfService, @NonNull long valueOfDelay) {
-        final String key = nameOfService.toLowerCase();
-        if (currentDelay.containsKey(key)) {
-            //TODO надо ли удалять?
-            currentDelay.remove(key);
-            currentDelay.put(key, valueOfDelay);
-        } else
-            log.error("Cant set new value for '{}', service not found", nameOfService);
+        if (currentDelay.containsKey(nameOfService) && schedulerDelays.get(nameOfService) >= 0) {
+            currentDelay.put(nameOfService, valueOfDelay);
+        } else {
+            throw new IncorrectParameterException(nameOfService);
+        }
     }
 
+
+    public void setNewService(@NonNull String nameOfService, @NonNull long valueOfDelay, long timeout) {
+        currentDelay.put(nameOfService, valueOfDelay);
+        servicesDefaultDelay.put(nameOfService, valueOfDelay);
+        servicesTimeout.put(nameOfService, timeout);
+        servicesScheduler.put(nameOfService, LocalDateTime.of(2000, 01, 01, 01, 01));
+        schedulerDelays.put(nameOfService, calculateMinus10PercentDelay().get(nameOfService));
+    }
+
+
     public LocalDateTime getSchedulerByService(@NonNull String nameOfService) {
-        return servicesScheduler.getOrDefault(nameOfService.toLowerCase(), LocalDateTime.of(2000, 01, 01, 01, 01));
+        return servicesScheduler.getOrDefault(nameOfService, LocalDateTime.of(2000, 01, 01, 01, 01));
     }
 
     public ConcurrentHashMap<String, LocalDateTime> getSchedulers() {
@@ -110,27 +117,22 @@ public class DelayValue {
 //    возвращать задержку для шедуллера
 
     public long getSchedulerDelayByService(@NonNull String nameOfService) {
-        return schedulerDelays.getOrDefault(nameOfService.toLowerCase(), 1000L);
+        return schedulerDelays.getOrDefault(nameOfService, 1000L);
     }
 
 
-//    выставлять задержку для шедуллера
-public void setNewDelayToScheduler(@NonNull String nameOfService, @NonNull long valueOfDelay) {
-    final String key = nameOfService.toLowerCase();
-    if (schedulerDelays.containsKey(key)) {
-        //TODO надо ли удалять?
-        schedulerDelays.remove(key);
-        schedulerDelays.put(key, valueOfDelay);
-    } else
-        log.error("Cant set new value for '{}', service not found", nameOfService);
-}
+    //    выставлять задержку для шедуллера
+    public void setNewDelayToScheduler(@NonNull String nameOfService, @NonNull long valueOfDelay) {
+        if (schedulerDelays.containsKey(nameOfService) && schedulerDelays.get(nameOfService) >= 0) {
+            schedulerDelays.put(nameOfService, valueOfDelay);
+        } else {
+            throw new IncorrectParameterException(nameOfService);
+        }
+    }
 
     public void setSchedulerToService(@NonNull String nameOfService, @NonNull LocalDateTime scheduler) {
-        final String key = nameOfService.toLowerCase();
-        if (servicesScheduler.containsKey(key)) {
-            //TODO надо ли удалять?
-            servicesScheduler.remove(key);
-            servicesScheduler.put(key, scheduler);
+        if (servicesScheduler.containsKey(nameOfService)) {
+            servicesScheduler.put(nameOfService, scheduler);
         } else
             log.error("Cant set new value for '{}', service not found", nameOfService);
     }
@@ -149,7 +151,7 @@ public void setNewDelayToScheduler(@NonNull String nameOfService, @NonNull long 
         return calculatedDelay;
     }
 
-    public DelayValue setMinus10PercentDelay(){
+    public DelayValue setMinus10PercentDelay() {
         return initializeWithoutDefault(calculateMinus10PercentDelay());
     }
 

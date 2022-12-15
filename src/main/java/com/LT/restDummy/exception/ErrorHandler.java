@@ -19,6 +19,13 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
+        return new ErrorResponse(String.format("Сервис не существует или заданный параметр меньше 0. Сервис: \"%s\".", e.getParameter())
+        );
+    }
+
     @ResponseBody
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
     public String handleHttpMediaTypeNotAcceptableException() {

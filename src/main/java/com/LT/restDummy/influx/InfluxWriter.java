@@ -8,7 +8,7 @@ import org.influxdb.dto.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.TimeUnit;
-
+/*Пишет в инфлюкс*/
 public class InfluxWriter {
     @Autowired
     private InfluxDB influxDB;
@@ -33,7 +33,7 @@ public class InfluxWriter {
     }
 
     public void addPoint(@NonNull String operationName) {
-        Long timestamp = System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis();
 
         Point point = Point.measurement(influxConnect.getSubsystem())
                 .time(timestamp, TimeUnit.MILLISECONDS)
@@ -44,22 +44,5 @@ public class InfluxWriter {
                 .tag("operationNameIncome", operationName)
                 .addField("timeDelay", String.valueOf(DelayValue.getInstance().getDelayByService(operationName))).build();
         influxDB.write(influxConnect.getDb(), influxConnect.getRetentionPolicy(), point);
-
-        /*Собирает пачки точек
-        batchPoints.point(point);*/
-
-    }
-
-    //    отправляет пачки точек
-    public void writeBatchPoints() {
-        influxDB.write(batchPoints);
-    }
-
-    //    чистит пачку чтобы не накапливались точки
-    public BatchPoints updateBatchPoints() {
-        return batchPoints = BatchPoints
-                .database(influxConnect.getDb())
-                .retentionPolicy(influxConnect.getRetentionPolicy())
-                .build();
     }
 }

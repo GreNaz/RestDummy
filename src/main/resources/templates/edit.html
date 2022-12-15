@@ -11,19 +11,19 @@
     <title>Изменить значение задержки</title>
 </head>
 
-<body>
+<body class="py-4">
 <div class="delay-table">
     <form action="#" th:action="@{/delay/save}" th:object="${form}">
-        <table class="table-primary">
-            <thead>
+        <table class="table">
+            <thead class="thead-dark">
             <tr>
-                <td>Сервис</td>
-                <td>текущая задержка в мс</td>
-                <td>Timeout в мс</td>
-                <td>Задержка для Scheduler</td>
-                <td>Scheduler Delay</td>
-                <td>Доступность</td>
-                <td>Scheduler выключения</td>
+                <th>Сервис</th>
+                <th>текущая задержка в мс</th>
+                <th>Timeout в мс</th>
+                <th>Задержка для Scheduler</th>
+                <th>Scheduler Delay</th>
+                <th>Доступность</th>
+                <th>Scheduler выключения</th>
             </tr>
             </thead>
             <tbody>
@@ -51,7 +51,7 @@
                            th:value="${service.getDelayForScheduler()}"/>
                 </td>
                 <td>
-                    <input type="text"  class="form-control date-format" min="0"
+                    <input type="text" class="form-control date-format" min="0"
                            th:name="|viewData[${itemStat.index}].schedulerDelay|"
                            th:value="${service.getSchedulerDelay()}"/>
                 </td>
@@ -60,7 +60,7 @@
                            th:checked="${service.getIsAvailable()}"/>
                 </td>
                 <td>
-                    <input type="text"  class="form-control date-format" min="0"
+                    <input type="text" class="form-control date-format" min="0"
                            th:name="|viewData[${itemStat.index}].schedulerAvailability|"
                            th:value="${service.getSchedulerAvailability()}"/>
                 </td>
@@ -68,17 +68,10 @@
             </tbody>
         </table>
         <div class="div-btn-submit">
-            <input class="buttonPink" type="submit"/>
+            <input class="buttonBlack" type="submit"/>
         </div>
     </form>
 </div>
-<!--<script type="text/javascript" th:src="@{/static/jquery-3.5.1.min.js}"></script>-->
-<!--<script type="text/javascript" th:src="@{/jquery.inputmask.js}"></script>-->
-<!--<script type="text/javascript" th:src="@{/inputmask.date.extensions.js}"></script>-->
-
-<!--<script src="/jquery-3.5.1.min.js"></script>-->
-<!--<script src="/jquery.inputmask.js"></script>-->
-<!--<script src="/inputmask.date.extensions.js"></script>-->
 </body>
 <script>
     $('.date-format').inputmask('datetime', {

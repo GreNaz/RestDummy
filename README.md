@@ -16,3 +16,6 @@
     Имя параметра должно совпадать с именем, передаваемым в качестве переменной в RestDummyController
     Например: Если вы задаете в delay.properties - ExampleService = 1000, 
         то в RestDummyController вам необходимо вернуть DummyHelper.returnResponse(ExampleService.getResponse(jsonObject), **"ExampleService"**, delay, isAvailable);
+
+ВАЖНО:
+в созданнных файлах сервисов имя параметров типа __RqUID__ должны соответствовать регистру тега, в котором хранятся.

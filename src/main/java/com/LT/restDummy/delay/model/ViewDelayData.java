@@ -3,7 +3,7 @@ package com.LT.restDummy.delay.model;
 import lombok.Getter;
 import lombok.Setter;
 
-// TODO заменить на @data
+/*Необходим для отображения через GUI*/
 @Getter
 @Setter
 public class ViewDelayData {
@@ -16,24 +16,6 @@ public class ViewDelayData {
     private Boolean isAvailable;
     private String schedulerAvailability;
 
-    public ViewDelayData(String name, Long currentDelay) {
-        this.name = name;
-        this.currentDelay = currentDelay;
-    }
-
-    public ViewDelayData(String name, Long currentDelay, Long timeout) {
-        this.name = name;
-        this.currentDelay = currentDelay;
-        this.timeout = timeout;
-    }
-
-    public ViewDelayData(String name, Long currentDelay, Long timeout, Boolean isAvailable) {
-        this.name = name;
-        this.currentDelay = currentDelay;
-        this.timeout = timeout;
-        this.isAvailable = isAvailable;
-    }
-
     public ViewDelayData(String name, Long currentDelay, Long timeout, Long delayForScheduler, String schedulerDelay, Boolean isAvailable, String schedulerAvailability) {
         this.name = name;
         this.currentDelay = currentDelay;
@@ -44,10 +26,12 @@ public class ViewDelayData {
         this.schedulerAvailability = schedulerAvailability;
     }
 
+    //    Не удалять. Без него ломается HTML
     public ViewDelayData() {
         this.name = "rand";
         this.currentDelay = 0L;
         this.timeout = 0L;
         this.isAvailable = false;
     }
+
 }

@@ -1,4 +1,4 @@
-package com.LT.restDummy.date.module;
+package com.LT.restDummy.date;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

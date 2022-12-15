@@ -1,83 +1,87 @@
 package com.LT.restDummy.Config;
 
-import com.LT.restDummy.availability.model.AvailabilityServiceValue;
+import com.LT.restDummy.availability.model.AvailabilityValue;
 import com.LT.restDummy.delay.model.DelayValue;
+import com.LT.restDummy.file.FileWork;
+import com.LT.restDummy.servises.ServiceValue;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
+import java.util.stream.Collectors;
 
+/*Класс создает бины для работы с сервисами, их задержками и доступностью.
+Инициализирует сервисы из файлов, если они есть в папке*/
 @Configuration
-@PropertySource("classpath:delay.properties")
 @Slf4j
 public class PropertyBeen {
+    ArrayList<String> allFiles = FileWork.getListFilesForFolder(new File("services"));
 
-    //     инициализация бина для задержки
-    @Bean("Custom_delay")
-    public DelayValue delay() {
+    @SneakyThrows
+    @Bean("CustomDelay")
+    public DelayValue delayFileEdition() {
         HashMap<String, Long> service_delay = new HashMap<>();
         HashMap<String, Long> service_timeout = new HashMap<>();
         HashMap<String, LocalDateTime> service_scheduler = new HashMap<>();
-        Properties propertiesDelay = new Properties();
-        Properties propertiesTimeout = new Properties();
-
-//        считывание из файла параметров задержки и таймаута
-        try {
-            InputStream inputDelay = this.getClass().getClassLoader().getResourceAsStream("delay.properties");
-            InputStream inputTimeout = this.getClass().getClassLoader().getResourceAsStream("timeout.properties");
-            if (inputDelay == null || inputTimeout == null) {
-                System.out.println("Sorry, unable to find .properties");
-            }
-            propertiesDelay.load(inputDelay);
-            propertiesTimeout.load(inputTimeout);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-//          формирование мапы для передачи в класс DelayValue
-        for (String key : propertiesDelay.stringPropertyNames()) {
-            service_delay.put(key, Long.valueOf(propertiesDelay.getProperty(key)));
-            if (propertiesTimeout.containsKey(key)) {
-                service_timeout.put(key, Long.valueOf(propertiesTimeout.getProperty(key)));
+        for (String allFile : allFiles) {
+            BufferedReader reader = new BufferedReader(new FileReader("services/" + allFile));
+            String response = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            String endpoint = FileWork.getContentEndPoint(response);
+            if (endpoint != null) {
+                service_delay.put(endpoint, FileWork.getContentDelay(response));
+                service_timeout.put(endpoint, FileWork.getContentTimeout(response));
+            } else {
+                service_delay.put(allFile, FileWork.getContentDelay(response));
+                service_timeout.put(allFile, FileWork.getContentTimeout(response));
             }
         }
-
         return DelayValue.getInstance().initialize(service_delay, service_timeout, service_scheduler);
     }
 
-    //     инициализация бина для доступности сервисов
+    @SneakyThrows
     @Bean("Availability")
-    public AvailabilityServiceValue availability() {
+    public AvailabilityValue availability() {
         HashMap<String, Boolean> service_availability = new HashMap<>();
         HashMap<String, LocalDateTime> service_scheduler = new HashMap<>();
-        Properties properties = new Properties();
+        for (String allFile : allFiles) {
+            BufferedReader reader = new BufferedReader(new FileReader("services/" + allFile));
+            String response = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            String endpoint = FileWork.getContentEndPoint(response);
+            if (endpoint != null) {
+                service_availability.put(endpoint, true);
 
-//      считывание из файла параметров задержки и таймаута
-        try {
-            InputStream inputDelay = this.getClass().getClassLoader().getResourceAsStream("delay.properties");
-            properties.load(inputDelay);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            } else {
+                service_availability.put(allFile, true);
+            }
         }
-
-        //          формирование мапы для передачи в класс DelayValue
-        for (String key : properties.stringPropertyNames()) {
-            service_availability.put(key, true);
-        }
-        return AvailabilityServiceValue.getInstance().initialize(service_availability, service_scheduler);
+        return AvailabilityValue.getInstance().initialize(service_availability, service_scheduler);
     }
 
+    @Bean("Services")
+    @SneakyThrows
+    public ServiceValue getFileServices() {
+        HashMap<String, String> services = new HashMap<>();
+        HashMap<String, String> types = new HashMap<>();
 
-
+        for (String allFile : allFiles) {
+            BufferedReader reader = new BufferedReader(new FileReader("services/" + allFile));
+            String response = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            String endpoint = FileWork.getContentEndPoint(response);
+            if (endpoint != null) {
+                services.put(endpoint, FileWork.getContentResponse(response));
+                types.put(endpoint, FileWork.getContentType(response));
+            } else {
+                services.put(allFile, FileWork.getContentResponse(response));
+                types.put(allFile, FileWork.getContentType(response));
+            }
+        }
+        return ServiceValue.getInstance().initialize(services, types);
+    }
 }
