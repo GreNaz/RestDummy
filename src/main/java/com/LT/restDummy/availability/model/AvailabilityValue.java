@@ -18,6 +18,7 @@ public class AvailabilityValue {
         static final AvailabilityValue HOLDER_INSTANCE = new AvailabilityValue();
     }
 
+    //        необходимо для использования нестатической переменной в статическом методе
     public static AvailabilityValue getInstance() {
         return AvailabilityValue.AvailabilityServiceValueHolder.HOLDER_INSTANCE;
     }

@@ -57,7 +57,6 @@ public class DelayController {
         for (ViewDelayData service : viewData.getViewData()) {
             delayValue.setNewDelayToService(service.getName(), service.getCurrentDelay());
             delayValue.setNewDelayToScheduler(service.getName(), service.getDelayForScheduler());
-
             delayValue.setSchedulerToService(service.getName(), LocalDateTime.parse(service.getSchedulerDelay(), DATE_TIME_FORMATTER));
             availabilityValue.setAvailabilityToService(service.getName(), service.getIsAvailable());
             availabilityValue.setSchedulerToService(service.getName(), LocalDateTime.parse(service.getSchedulerAvailability(), DATE_TIME_FORMATTER));
@@ -100,6 +99,7 @@ public class DelayController {
         return "newServices";
     }
 
+    //    Сохранение сервиса. Если есть параметр эндпоинта, то он становится именем сервиса(но не файла)
     @RequestMapping(value = "/services/save")
     public String saveAddForm(@ModelAttribute(name = "viewServiceData") ViewServiceData viewData, Model model) {
         String endpoint = FileWork.getContentEndPoint(viewData.getContent());

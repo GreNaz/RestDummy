@@ -26,7 +26,7 @@ public class PropertyBeen {
 
     @SneakyThrows
     @Bean("CustomDelay")
-    public DelayValue delayFileEdition() {
+    public DelayValue delay() {
         HashMap<String, Long> service_delay = new HashMap<>();
         HashMap<String, Long> service_timeout = new HashMap<>();
         HashMap<String, LocalDateTime> service_scheduler = new HashMap<>();

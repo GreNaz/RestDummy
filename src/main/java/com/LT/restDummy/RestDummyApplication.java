@@ -22,6 +22,7 @@ public class RestDummyApplication {
         Properties properties = new Properties();
         properties.load(new FileInputStream("properties"));
         System.setProperty("server.port", properties.getProperty("server.port"));
+        System.setProperty("logging.level.root", properties.getProperty("logging.level.root"));
         SpringApplication.run(RestDummyApplication.class, args);
     }
 }

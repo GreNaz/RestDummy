@@ -26,12 +26,32 @@
                 <td>
                     <input type="text" class="form-control form-addSrv"
                            th:name="ServiceName"
-                           th:value="${viewServiceData.getServiceName()}"/>
+                           th:value="${viewServiceData.getServiceName()}" placeholder='NewService'/>
                 </td>
                 <td>
-                    <textarea class="form-control form-addSrv" rows="20"
+                    <textarea class="form-control form-addSrv" rows="21"
                               th:name="Content"
-                              th:value="${viewServiceData.getContent()}"></textarea>
+                              th:value="${viewServiceData.getContent()}" placeholder='{
+    "rqUid": "__rqUid__",
+    "rqTm": "__rqTm__",
+    "operUid": "ccc147cfbbe14934a2b470bb0afa20f4",
+    "spName": "urn: sbrfsystems: 99-ufs",
+    "systemId": "urn: sbrfsystems: 99-pprb",
+    "status": {
+        "statusCode": 0,
+        "statusDesc": "Успешно создан драфт договора. "
+    }
+}
+/* Обращайте внимание на имя параметров типа __rqUid__ - РЕГИСТР ДОЛЖЕН СООТВЕТСТВОВАТЬ ПОЛЮ/TЭГУ.
+Ниже - обязательный для заполнения раздел.
+Для корректной работы необходимо заключить текст в "---".
+И закрывать каждый параметр ";".
+Поддерживаемые типы файлов: xml, json. */
+---
+delay=1000;
+timeout=3000;
+type=json;
+---'></textarea>
                 </td>
             </tr>
             </tbody>

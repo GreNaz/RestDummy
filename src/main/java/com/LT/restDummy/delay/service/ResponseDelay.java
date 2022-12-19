@@ -21,6 +21,7 @@ public class ResponseDelay {
         CompletableFuture<ResponseEntity<String>> response = new CompletableFuture<>();
         scheduler.schedule(() -> {
             response.complete(ResponseEntity.ok(responseBody));
+            log.info("RESPONSE: " + responseBody);
             InfluxWriter.getInstance().addPoint(operationName);
         }, delay, TimeUnit.MILLISECONDS);
         return response;

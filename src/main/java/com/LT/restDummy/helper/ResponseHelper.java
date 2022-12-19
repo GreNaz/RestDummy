@@ -20,9 +20,10 @@ import java.util.regex.Pattern;
 @Slf4j
 public class ResponseHelper {
 
-    public static CompletableFuture<ResponseEntity<String>> returnResponseFileEdition(String request, String serviceName,
-                                                                                      long delay,
-                                                                                      Boolean isAvailable) {
+    public static CompletableFuture<ResponseEntity<String>> returnResponse(String request, String serviceName,
+                                                                           long delay,
+                                                                           Boolean isAvailable) {
+        log.info("REQUEST: " + request);
         // Если параметры заданы, то обновляем их
         if (delay != 0) {
             DelayValue.getInstance().setNewDelayToService(serviceName, delay);
@@ -34,32 +35,14 @@ public class ResponseHelper {
         if (AvailabilityValue.getInstance().getAvailabilityByService(serviceName)) {
 //            передаем параметры для задержки: секунды, закорелированный ответ и сервис
             return ResponseDelay.scheduleResponse(DelayValue.getInstance().getDelayByService(serviceName),
-                    responseCorrelateFileEdition(request,
+                    responseCorrelate(request,
                             ServiceValue.getInstance().getResponseByService(serviceName),
                             ServiceValue.getInstance().getTypeByService(serviceName)),
                     serviceName);
         } else throw new ServiceException("Сервис временно недоступен. Включите заглушку");
     }
 
-    public static CompletableFuture<ResponseEntity<String>> returnResponse(String response,
-                                                                           String serviceName,
-                                                                           long delay,
-                                                                           Boolean isAvailable) {
-        // Если параметры заданы, то обновляем их
-        if (delay != 0) {
-            DelayValue.getInstance().setNewDelayToService(serviceName, delay);
-        }
-        if (isAvailable != null) {
-            AvailabilityValue.getInstance().setAvailabilityToService(serviceName, isAvailable);
-        }
-        // Если сервис доступен, то возвращаем его
-        if (AvailabilityValue.getInstance().getAvailabilityByService(serviceName)) {
-            return ResponseDelay.scheduleResponse(DelayValue.getInstance().getDelayByService(serviceName),
-                    response, serviceName);
-        } else throw new ServiceException("Сервис временно недоступен. Включите заглушку");
-    }
-
-    public static String parameterCorrelateFileEdition(String request, String param, String type) {
+    public static String parameterCorrelate(String request, String param, String type) {
         request = request.toLowerCase(Locale.ROOT).replaceAll("\\s+", "");
         param = param.toLowerCase(Locale.ROOT);
         switch (type.toLowerCase(Locale.ROOT)) {
@@ -73,7 +56,7 @@ public class ResponseHelper {
     }
 
     //
-    public static String responseCorrelateFileEdition(String request, String response, String type) {
+    public static String responseCorrelate(String request, String response, String type) {
 //       собираем все параметры, необходимые к замене
         Matcher matcher = Pattern.compile("__([a-zA-Z0-9]+)__").matcher(response);
         ArrayList<String> params = new ArrayList<>();
@@ -96,11 +79,11 @@ public class ResponseHelper {
 //            String lowerCaseResponse = response.toLowerCase(Locale.ROOT);
             Matcher matcherResponse = patternResponse.matcher(response);
             while (matcherResponse.find()) {
-                //            Заменяем найденную подстроку на значение из запроса или текущее время
+//            Заменяем найденную подстроку на значение из запроса или текущее время
                 if (param.equalsIgnoreCase("rqtm")) {
                     response = StringUtils.replace(response, matcherResponse.group(1), DateModule.get_date_now());
                 } else {
-                    response = StringUtils.replace(response, matcherResponse.group(1), parameterCorrelateFileEdition(request, param, type));
+                    response = StringUtils.replace(response, matcherResponse.group(1), parameterCorrelate(request, param, type));
                 }
             }
         }

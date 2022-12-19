@@ -3,7 +3,6 @@ package com.LT.restDummy.servises;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /*Класс хранит названия сервисов и responses*/
@@ -17,6 +16,7 @@ public class ServiceValue {
         static final ServiceValue HOLDER_INSTANCE = new ServiceValue();
     }
 
+    //        необходимо для использования нестатической переменной в статическом методе
     public static ServiceValue getInstance() {
         return ServicesValueHolder.HOLDER_INSTANCE;
     }

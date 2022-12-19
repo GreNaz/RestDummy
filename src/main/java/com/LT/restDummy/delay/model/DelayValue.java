@@ -34,6 +34,7 @@ public class DelayValue {
         static final DelayValue HOLDER_INSTANCE = new DelayValue();
     }
 
+    //    необходимо для использования нестатической переменной в статическом методе
     public static DelayValue getInstance() {
         return DelayValueHolder.HOLDER_INSTANCE;
     }
