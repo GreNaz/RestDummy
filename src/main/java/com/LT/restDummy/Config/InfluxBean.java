@@ -40,15 +40,14 @@ public class InfluxBean {
     @Bean("InfluxConnect")
     public InfluxConnect InfluxConnect(@Value("${influxdb.database}") String db,
                                        @Value("${influxdb.retentionpolicy}") String retentionpolicy,
-                                       @Value("${influxdb.block}") String block,
-                                       @Value("${influxdb.chanel}") String chanel) {
+                                       @Value("${influxdb.block}") String block) {
 
         InfluxConnect influxConnect = new InfluxConnect();
         influxConnect.setDb(db);
         influxConnect.setRetentionPolicy(retentionpolicy);
         influxConnect.setSubsystem(FileWork.getInfluxProperty().getOrDefault("subsystem", "CREATE_SUBSYSTEM").toString());
         influxConnect.setBlock(block);
-        influxConnect.setChanel(chanel);
+        influxConnect.setChanel(FileWork.getInfluxProperty().getOrDefault("influxdb.chanel", "SBOL").toString());
         return influxConnect;
     }
 }

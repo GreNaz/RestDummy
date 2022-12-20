@@ -2,3 +2,4 @@ server.port=20001
 # меняйте логирование на что-то другое только если жизненно необходимо!
 logging.level.root=error
 subsystem=VASHA_SUBSYSTEM
+influxdb.chanel=SBOL
