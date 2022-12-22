@@ -119,6 +119,18 @@ public class DelayController {
         return "redirect:/delay";
     }
 
+    @RequestMapping(value = "/services/update")
+    public String updateForm(@ModelAttribute(name = "viewServiceData") ViewServiceData viewData, Model model) {
+        String content = serviceValue.getResponseByService(viewData.getServiceName());
+        if (content == null || content.isEmpty()) {
+            viewData.setContent("Файла не существует или он пуст.");
+        } else {
+            viewData.setContent(content);
+        }
+        model.addAttribute("viewServiceData", viewData);
+        return "newServices";
+    }
+
     private Model getForm(Model model) {
         List<String> services = delayValue.getServices();
         List<ViewDelayData> dataList = new ArrayList<>();

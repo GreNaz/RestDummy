@@ -27,6 +27,10 @@ tr:nth-child(even) {
     background: #e9ecef;
 }
 
+.text-grey{
+    color: #6d757d;
+}
+
 .prompt {
     font-size: 0.8rem;
     vertical-align: top;

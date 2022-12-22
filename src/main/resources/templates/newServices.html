@@ -2,18 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>New service</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <script src="/jquery-3.5.1.min.js"></script>
     <script src="/jquery.inputmask.js"></script>
     <script src="/inputmask.date.extensions.js"></script>
     <link href="/webjars/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="/bootstrap-icons.css" rel="stylesheet"/>
     <link href="/style.css" rel="stylesheet"/>
-    <title>Изменить значение задержки</title>
 </head>
 
 <body class="py-4">
 <div class="delay-table">
-    <form action="#" th:action="@{/services/save}" th:object="${viewServiceData}" method="post">
+    <form id='myForm' action="#" th:object="${viewServiceData}" method="post">
         <table class="table">
             <thead class="thead-dark">
             <tr>
@@ -27,11 +28,14 @@
                     <input type="text" class="form-control form-addSrv"
                            th:name="ServiceName"
                            th:value="${viewServiceData.getServiceName()}" placeholder='NewService'/>
+
+                    <div class="text-grey"> <br> Чтобы отредактировать текущий текст сервиса - введите только название
+                        нужного сервиса и нажмите кнопку "Хочу текст файла".</div>
                 </td>
                 <td>
                     <textarea class="form-control form-addSrv" rows="21"
                               th:name="Content"
-                              th:value="${viewServiceData.getContent()}" placeholder='{
+                              th:text="${viewServiceData.getContent()}" placeholder='{
     "rqUid": "__rqUid__",
     "rqTm": "__rqTm__",
     "operUid": "ccc147cfbbe14934a2b470bb0afa20f4",
@@ -51,15 +55,28 @@
 delay=1000;
 timeout=3000;
 type=json;
----'></textarea>
+---'  ></textarea>
                 </td>
             </tr>
             </tbody>
         </table>
         <div class="div-btn-submit">
-            <input class="buttonBlack" type="submit"/>
+            <input class="buttonBlack" type="button" name="save_btn" id="save_btn" value="Сохранить"/>
+            <input  type="button" name="update_btn" id="update_btn" value="Хочу текст файла"  class="buttonBlack"  />
         </div>
     </form>
 </div>
 </body>
+<script>
+    $('#save_btn').click(function(){
+        var form = document.getElementById("myForm")
+        form.action = "/services/save";
+        form.submit();
+    });
+    $('#update_btn').click(function(){
+        var form = document.getElementById("myForm")
+        form.action = "/services/update";
+        form.submit();
+    });
+</script>
 </html>
