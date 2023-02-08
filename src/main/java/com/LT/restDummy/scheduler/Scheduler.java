@@ -40,7 +40,7 @@ public class Scheduler {
             }
         }
         if (isScheduledAvailability) {
-            Thread.sleep(60000); // - 10 ???
+            Thread.sleep(600000); // - 10 ???
             for (String service : servicesStop.keySet()) {
                 if (servicesStop.get(service)) {
                     AvailabilityValue.getInstance().setAvailabilityToService(service, true);
@@ -50,7 +50,7 @@ public class Scheduler {
     }
 
     @SneakyThrows
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 600000)
     public static void schedulingDelay() {
         boolean isScheduledDelay = false;
         LocalDateTime now = LocalDateTime.parse(LocalDateTime.now().format(DATE_TIME_FORMATTER), DATE_TIME_FORMATTER);
@@ -72,7 +72,7 @@ public class Scheduler {
             }
         }
         if (isScheduledDelay) {
-            Thread.sleep(60000); // - 10 мин
+            Thread.sleep(600000); // - 10 мин
             for (String service : servicesDelay.keySet()) {
                 if (servicesDelay.get(service)) {
                     DelayValue.getInstance().setNewDelayToService(service, DelayValue.getInstance().getServicesDefaultDelay().get(service));
@@ -81,6 +81,5 @@ public class Scheduler {
         }
 
     }
-
 }
 
