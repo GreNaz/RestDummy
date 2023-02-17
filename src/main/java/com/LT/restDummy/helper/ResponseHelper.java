@@ -80,7 +80,7 @@ public class ResponseHelper {
             Matcher matcherResponse = patternResponse.matcher(response);
             while (matcherResponse.find()) {
 //            Заменяем найденную подстроку на значение из запроса или текущее время
-                if (param.equalsIgnoreCase("rqtm")) {
+                if (param.equalsIgnoreCase("rqtm")|| param.equalsIgnoreCase("rstm")) {
                     response = StringUtils.replace(response, matcherResponse.group(1), DateModule.get_date_now());
                 } else {
                     response = StringUtils.replace(response, matcherResponse.group(1), parameterCorrelate(request, param, type));
