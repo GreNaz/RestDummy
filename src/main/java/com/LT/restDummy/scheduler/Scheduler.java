@@ -18,7 +18,7 @@ public class Scheduler {
     protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     @SneakyThrows
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 60000) // как часто проверка(1 мин)
     public static void schedulingAvailability() {
         boolean isScheduledAvailability = false;
         LocalDateTime now = LocalDateTime.parse(LocalDateTime.now().format(DATE_TIME_FORMATTER), DATE_TIME_FORMATTER);
@@ -50,7 +50,7 @@ public class Scheduler {
     }
 
     @SneakyThrows
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 60000) // как часто проверка(1 мин)
     public static void schedulingDelay() {
         boolean isScheduledDelay = false;
         LocalDateTime now = LocalDateTime.parse(LocalDateTime.now().format(DATE_TIME_FORMATTER), DATE_TIME_FORMATTER);
