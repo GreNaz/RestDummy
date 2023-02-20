@@ -50,7 +50,7 @@ public class Scheduler {
     }
 
     @SneakyThrows
-    @Scheduled(fixedRate = 600000)
+    @Scheduled(fixedRate = 60000)
     public static void schedulingDelay() {
         boolean isScheduledDelay = false;
         LocalDateTime now = LocalDateTime.parse(LocalDateTime.now().format(DATE_TIME_FORMATTER), DATE_TIME_FORMATTER);
