@@ -40,7 +40,7 @@ public class Scheduler {
             }
         }
         if (isScheduledAvailability) {
-            Thread.sleep(600000); // - 10 ???
+            Thread.sleep(600000); // - 10 мин
             for (String service : servicesStop.keySet()) {
                 if (servicesStop.get(service)) {
                     AvailabilityValue.getInstance().setAvailabilityToService(service, true);

@@ -5,16 +5,18 @@ import com.LT.restDummy.date.DateModule;
 import com.LT.restDummy.delay.model.DelayValue;
 import com.LT.restDummy.delay.service.ResponseDelay;
 import com.LT.restDummy.exception.ServiceException;
+import com.LT.restDummy.servises.Service;
 import com.LT.restDummy.servises.ServiceValue;
+import com.LT.restDummy.servises.ServiceValueNew;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /*Класс помощник для работы с ответами сервисов*/
 @Slf4j
@@ -36,10 +38,28 @@ public class ResponseHelper {
 //            передаем параметры для задержки: секунды, закорелированный ответ и сервис
             return ResponseDelay.scheduleResponse(DelayValue.getInstance().getDelayByService(serviceName),
                     responseCorrelate(request,
-                            ServiceValue.getInstance().getResponseByService(serviceName),
+                            getResponseByPercent(ServiceValueNew.getInstance().getService(serviceName)),
                             ServiceValue.getInstance().getTypeByService(serviceName)),
                     serviceName);
         } else throw new ServiceException("Сервис временно недоступен. Включите заглушку");
+    }
+
+
+
+//    Сортирует пороговые значения ответов по возрастанию, если рандомное число попадает в порог то отправляем ответ закрепленный за порогом
+    public static String getResponseByPercent(Service service) {
+        int rand = 1 + (int) (Math.random() * 100);
+// TODO держать отсортированные пороги в сервисе
+        List<Integer> thresholds = service.getResponse().keySet().stream().sorted().collect(Collectors.toList());
+        if (service.isPercentage()) {
+            int startNumThreshold = 0;
+            for (Integer endNumThreshold : thresholds) {
+                if (rand > startNumThreshold && rand <= endNumThreshold)
+                    return service.getResponse().get(endNumThreshold);
+                else startNumThreshold = endNumThreshold;
+            }
+        }
+        return service.getResponse().get(-1);
     }
 
     public static String parameterCorrelate(String request, String param, String type) {
@@ -55,7 +75,7 @@ public class ResponseHelper {
         }
     }
 
-    //
+
     public static String responseCorrelate(String request, String response, String type) {
 //       собираем все параметры, необходимые к замене
         Matcher matcher = Pattern.compile("__([a-zA-Z0-9]+)__").matcher(response);
@@ -76,7 +96,6 @@ public class ResponseHelper {
                     patternResponse = Pattern.compile("\"" + param + "\":\"(__[a-zA-Z0-9]*__)\"");
                     break;
             }
-//            String lowerCaseResponse = response.toLowerCase(Locale.ROOT);
             Matcher matcherResponse = patternResponse.matcher(response);
             while (matcherResponse.find()) {
 //            Заменяем найденную подстроку на значение из запроса или текущее время
@@ -89,5 +108,6 @@ public class ResponseHelper {
         }
         return response;
     }
-}
 
+
+}

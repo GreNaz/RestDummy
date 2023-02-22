@@ -1,5 +1,6 @@
 package com.LT.restDummy.file;
 
+import com.LT.restDummy.servises.Service;
 import com.google.common.io.Files;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +10,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /*Класс для работы с файлами и данными из файлов*/
 @Slf4j
@@ -38,6 +42,45 @@ public class FileWork {
             return "Текст сервиса не найден";
         }
 
+    }
+
+    public static Service getService(String content) {
+        Service service = new Service();
+        ConcurrentHashMap<Integer, String> map = new ConcurrentHashMap<>();
+
+        if (content.isEmpty()) {
+            map.put(-1, "Текст сервиса не найден");
+        } else {
+            service.setFullServiceFile(content);
+            Matcher matcherThreshold = Pattern.compile("threshold=(.+?);").matcher(content);
+            Matcher matcherContent = Pattern.compile("-###-([\\s\\S]+?)-###-").matcher(content);
+            ArrayList<String> responses = new ArrayList<>();
+            ArrayList<Integer> threshold = new ArrayList<>();
+
+            while (matcherThreshold.find()) {
+                threshold = Arrays.stream(matcherThreshold.group(1).split(",")).map(Integer::parseInt).collect(Collectors.toCollection(ArrayList::new));
+            }
+            if (threshold.isEmpty()) {
+                map.put(-1, getContentResponse(content));
+            } else {
+                while (matcherContent.find()) {
+                    responses.add(matcherContent.group(1));
+                }
+                if (responses.size() == 1) {
+                    map.put(-1, responses.get(0));
+                } else if (responses.size() > 1) {
+                    service.setPercentage(true);
+                    for (int i = 0; i < responses.size(); i++) {
+                        map.put(threshold.get(i), responses.get(i));
+                    }
+                } else {
+                    map.put(-1, "не нашлось подходящих совпадений регулярки, убедитесь в правильности заполнения файла заглушки.");
+                }
+            }
+        }
+
+        service.setResponse(map);
+        return service;
     }
 
     public static String getContentType(String content) {

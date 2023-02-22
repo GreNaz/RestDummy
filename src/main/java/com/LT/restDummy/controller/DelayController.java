@@ -7,6 +7,7 @@ import com.LT.restDummy.delay.model.ViewDelayData;
 import com.LT.restDummy.delay.model.ViewDelayDataDTO;
 import com.LT.restDummy.file.FileWork;
 import com.LT.restDummy.servises.ServiceValue;
+import com.LT.restDummy.servises.ServiceValueNew;
 import com.LT.restDummy.servises.ViewServiceData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,10 @@ public class DelayController {
     protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     private final DelayValue delayValue;
     private final AvailabilityValue availabilityValue;
-    private final ServiceValue serviceValue;
+    private final ServiceValueNew serviceValue;
 
     @Autowired
-    public DelayController(DelayValue delayValue, AvailabilityValue availabilityValue, ServiceValue serviceValue) {
+    public DelayController(DelayValue delayValue, AvailabilityValue availabilityValue, ServiceValueNew serviceValue) {
         this.delayValue = delayValue;
         this.availabilityValue = availabilityValue;
         this.serviceValue = serviceValue;
@@ -102,26 +103,27 @@ public class DelayController {
     //    Сохранение сервиса. Если есть параметр эндпоинта, то он становится именем сервиса(но не файла)
     @RequestMapping(value = "/services/save")
     public String saveAddForm(@ModelAttribute(name = "viewServiceData") ViewServiceData viewData, Model model) {
-        String endpoint = FileWork.getContentEndPoint(viewData.getContent());
+        String ServiceNameOrEndpoint = FileWork.getContentEndPoint(viewData.getContent());
         FileWork.fullFile(viewData.getServiceName(), viewData.getContent());
-        if (endpoint == null) {
-            endpoint = viewData.getServiceName();
+        if (ServiceNameOrEndpoint == null) {
+            ServiceNameOrEndpoint = viewData.getServiceName();
         }
-        serviceValue.setResponseByService(endpoint,
-                FileWork.getContentResponse(viewData.getContent()));
-        serviceValue.setTypeByService(endpoint,
+
+        serviceValue.setService(ServiceNameOrEndpoint,
+                FileWork.getService(viewData.getContent()));
+        serviceValue.setTypeByService(ServiceNameOrEndpoint,
                 FileWork.getContentType(viewData.getContent()));
-        delayValue.setNewService(endpoint,
+        delayValue.setNewService(ServiceNameOrEndpoint,
                 FileWork.getContentDelay(viewData.getContent()),
                 FileWork.getContentTimeout(viewData.getContent()));
-        availabilityValue.setAvailabilityToService(endpoint, true);
-        availabilityValue.setDefaultSchedulerAvailability(endpoint);
+        availabilityValue.setAvailabilityToService(ServiceNameOrEndpoint, true);
+        availabilityValue.setDefaultSchedulerAvailability(ServiceNameOrEndpoint);
         return "redirect:/delay";
     }
 
     @RequestMapping(value = "/services/update")
     public String updateForm(@ModelAttribute(name = "viewServiceData") ViewServiceData viewData, Model model) {
-        String content = serviceValue.getResponseByService(viewData.getServiceName());
+        String content = serviceValue.getFullFileByService(viewData.getServiceName());
         if (content == null || content.isEmpty()) {
             viewData.setContent("Файла не существует или он пуст.");
         } else {
