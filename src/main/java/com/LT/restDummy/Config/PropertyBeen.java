@@ -3,6 +3,7 @@ package com.LT.restDummy.Config;
 import com.LT.restDummy.availability.model.AvailabilityValue;
 import com.LT.restDummy.delay.model.DelayValue;
 import com.LT.restDummy.file.FileWork;
+import com.LT.restDummy.servises.Service;
 import com.LT.restDummy.servises.ServiceValue;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -64,10 +65,10 @@ public class PropertyBeen {
         return AvailabilityValue.getInstance().initialize(service_availability, service_scheduler);
     }
 
-    @Bean("Services")
     @SneakyThrows
+    @Bean("Services")
     public ServiceValue getFileServices() {
-        HashMap<String, String> services = new HashMap<>();
+        HashMap<String, Service> services = new HashMap<>();
         HashMap<String, String> types = new HashMap<>();
 
         for (String allFile : allFiles) {
@@ -75,10 +76,10 @@ public class PropertyBeen {
             String response = reader.lines().collect(Collectors.joining(System.lineSeparator()));
             String endpoint = FileWork.getContentEndPoint(response);
             if (endpoint != null) {
-                services.put(endpoint, FileWork.getContentResponse(response));
+                services.put(endpoint, FileWork.getService(response));
                 types.put(endpoint, FileWork.getContentType(response));
             } else {
-                services.put(allFile, FileWork.getContentResponse(response));
+                services.put(allFile, FileWork.getService(response));
                 types.put(allFile, FileWork.getContentType(response));
             }
         }

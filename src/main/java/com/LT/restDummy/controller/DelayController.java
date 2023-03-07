@@ -102,26 +102,27 @@ public class DelayController {
     //    Сохранение сервиса. Если есть параметр эндпоинта, то он становится именем сервиса(но не файла)
     @RequestMapping(value = "/services/save")
     public String saveAddForm(@ModelAttribute(name = "viewServiceData") ViewServiceData viewData, Model model) {
-        String endpoint = FileWork.getContentEndPoint(viewData.getContent());
+        String ServiceNameOrEndpoint = FileWork.getContentEndPoint(viewData.getContent());
         FileWork.fullFile(viewData.getServiceName(), viewData.getContent());
-        if (endpoint == null) {
-            endpoint = viewData.getServiceName();
+        if (ServiceNameOrEndpoint == null) {
+            ServiceNameOrEndpoint = viewData.getServiceName();
         }
-        serviceValue.setResponseByService(endpoint,
-                FileWork.getContentResponse(viewData.getContent()));
-        serviceValue.setTypeByService(endpoint,
+
+        serviceValue.setService(ServiceNameOrEndpoint,
+                FileWork.getService(viewData.getContent()));
+        serviceValue.setTypeByService(ServiceNameOrEndpoint,
                 FileWork.getContentType(viewData.getContent()));
-        delayValue.setNewService(endpoint,
+        delayValue.setNewService(ServiceNameOrEndpoint,
                 FileWork.getContentDelay(viewData.getContent()),
                 FileWork.getContentTimeout(viewData.getContent()));
-        availabilityValue.setAvailabilityToService(endpoint, true);
-        availabilityValue.setDefaultSchedulerAvailability(endpoint);
+        availabilityValue.setAvailabilityToService(ServiceNameOrEndpoint, true);
+        availabilityValue.setDefaultSchedulerAvailability(ServiceNameOrEndpoint);
         return "redirect:/delay";
     }
 
     @RequestMapping(value = "/services/update")
     public String updateForm(@ModelAttribute(name = "viewServiceData") ViewServiceData viewData, Model model) {
-        String content = serviceValue.getResponseByService(viewData.getServiceName());
+        String content = serviceValue.getFullFileByService(viewData.getServiceName());
         if (content == null || content.isEmpty()) {
             viewData.setContent("Файла не существует или он пуст.");
         } else {
