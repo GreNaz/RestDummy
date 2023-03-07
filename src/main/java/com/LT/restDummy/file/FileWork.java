@@ -71,7 +71,7 @@ public class FileWork {
                 } else if (responses.size() > 1) {
                     service.setPercentage(true);
                     for (int i = 0; i < responses.size(); i++) {
-                        map.put(threshold.get(i), responses.get(i));
+                        map.put(threshold.get(i), responses.get(i).replaceAll(": \"", ":\""));
                     }
                 } else {
                     map.put(-1, "не нашлось подходящих совпадений регулярки, убедитесь в правильности заполнения файла заглушки.");
@@ -80,6 +80,10 @@ public class FileWork {
         }
 
         service.setResponse(map);
+
+        if (service.isPercentage()){
+            service.setThresholds(service.getResponse().keySet().stream().sorted().collect(Collectors.toList()));
+        }
         return service;
     }
 

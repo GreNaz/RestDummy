@@ -7,7 +7,6 @@ import com.LT.restDummy.delay.model.ViewDelayData;
 import com.LT.restDummy.delay.model.ViewDelayDataDTO;
 import com.LT.restDummy.file.FileWork;
 import com.LT.restDummy.servises.ServiceValue;
-import com.LT.restDummy.servises.ServiceValueNew;
 import com.LT.restDummy.servises.ViewServiceData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +28,10 @@ public class DelayController {
     protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     private final DelayValue delayValue;
     private final AvailabilityValue availabilityValue;
-    private final ServiceValueNew serviceValue;
+    private final ServiceValue serviceValue;
 
     @Autowired
-    public DelayController(DelayValue delayValue, AvailabilityValue availabilityValue, ServiceValueNew serviceValue) {
+    public DelayController(DelayValue delayValue, AvailabilityValue availabilityValue, ServiceValue serviceValue) {
         this.delayValue = delayValue;
         this.availabilityValue = availabilityValue;
         this.serviceValue = serviceValue;

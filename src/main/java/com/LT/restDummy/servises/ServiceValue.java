@@ -1,28 +1,23 @@
 package com.LT.restDummy.servises;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-/*Класс хранит названия сервисов и responses*/
-@Slf4j
 public class ServiceValue {
-
-    private static final ConcurrentHashMap<String, String> servicesResponse = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, String> servicesType = new ConcurrentHashMap<>();
 
-    public static class ServicesValueHolder {
+    public static class ServiceValueNewHolder {
         static final ServiceValue HOLDER_INSTANCE = new ServiceValue();
     }
 
     //        необходимо для использования нестатической переменной в статическом методе
     public static ServiceValue getInstance() {
-        return ServicesValueHolder.HOLDER_INSTANCE;
+        return ServiceValue.ServiceValueNewHolder.HOLDER_INSTANCE;
     }
 
-    public ServiceValue initialize(HashMap<String, String> responses, HashMap<String, String> types) {
-        servicesResponse.putAll(responses);
+    public ServiceValue initialize(HashMap<String, Service> responses, HashMap<String, String> types) {
+        services.putAll(responses);
         servicesType.putAll(types);
         return this;
     }
@@ -34,12 +29,20 @@ public class ServiceValue {
     public void setTypeByService(String serviceName, String type) {
         servicesType.put(serviceName, type);
     }
-
-    public String getResponseByService(String serviceName) {
-        return servicesResponse.getOrDefault(serviceName, "");
+    //
+    public String getFullFileByService(String serviceName) {
+        return services.getOrDefault(serviceName, null).getFullServiceFile();
     }
 
-    public void setResponseByService(String serviceName, String response) {
-        servicesResponse.put(serviceName, response);
+    public Service getService(String serviceName) {
+        return services.getOrDefault(serviceName, null);
+    }
+
+    public void setService(String serviceName, Service service) {
+        services.put(serviceName, service);
+    }
+
+    public void setResponseByService(String serviceName, Service service) {
+        services.put(serviceName, service);
     }
 }

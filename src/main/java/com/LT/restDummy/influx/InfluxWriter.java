@@ -8,6 +8,7 @@ import org.influxdb.dto.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.TimeUnit;
+
 /*Пишет в инфлюкс*/
 public class InfluxWriter {
     @Autowired

@@ -5,7 +5,6 @@ import com.LT.restDummy.delay.model.DelayValue;
 import com.LT.restDummy.file.FileWork;
 import com.LT.restDummy.servises.Service;
 import com.LT.restDummy.servises.ServiceValue;
-import com.LT.restDummy.servises.ServiceValueNew;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -68,7 +67,7 @@ public class PropertyBeen {
 
     @SneakyThrows
     @Bean("Services")
-    public ServiceValueNew getFileServicesNew() {
+    public ServiceValue getFileServices() {
         HashMap<String, Service> services = new HashMap<>();
         HashMap<String, String> types = new HashMap<>();
 
@@ -84,6 +83,6 @@ public class PropertyBeen {
                 types.put(allFile, FileWork.getContentType(response));
             }
         }
-        return ServiceValueNew.getInstance().initialize(services, types);
+        return ServiceValue.getInstance().initialize(services, types);
     }
 }

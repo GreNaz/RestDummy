@@ -5,14 +5,14 @@ import lombok.Setter;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public class Service {
-    //    ключ число для рандома
-    String fullServiceFile;
-//    List<Integer> thresholds; TODO !!!
+    //    Ключ - число для процентного распределения
     ConcurrentHashMap<Integer, String> response = new ConcurrentHashMap<>();
+    //    отсортированные значения распределения
+    List<Integer> thresholds;
+    String fullServiceFile;
     boolean percentage = false;
 }
