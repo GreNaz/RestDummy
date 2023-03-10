@@ -1,16 +1,37 @@
 package com.LT.restDummy.servises;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+///*Необходим для отображения через GUI*/
 
-/*Необходим для отображения через GUI*/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ViewServiceData {
-    private String serviceName;
-    private String content;
+    private String name;
+    private Long currentDelay;
+    private Long timeout;
+    private Long delayForScheduler;
+    private String schedulerDelay;
+    private Boolean isAvailable;
+    private String schedulerAvailability;
 
+    public ViewServiceData(String name, Long currentDelay, Long timeout, Long delayForScheduler, String schedulerDelay, Boolean isAvailable, String schedulerAvailability) {
+        this.name = name;
+        this.currentDelay = currentDelay;
+        this.timeout = timeout;
+        this.delayForScheduler = delayForScheduler;
+        this.schedulerDelay = schedulerDelay;
+        this.isAvailable = isAvailable;
+        this.schedulerAvailability = schedulerAvailability;
+    }
+
+    //    Не удалять. Без него ломается HTML
+    public ViewServiceData() {
+        this.name = "rand";
+        this.currentDelay = 0L;
+        this.timeout = 0L;
+        this.isAvailable = false;
+    }
 
 }

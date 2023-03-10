@@ -1,4 +1,4 @@
-package com.LT.restDummy.delay.service;
+package com.LT.restDummy.servises;
 
 import com.LT.restDummy.influx.InfluxWriter;
 import lombok.SneakyThrows;

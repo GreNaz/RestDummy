@@ -1,6 +1,8 @@
 package com.LT.restDummy.influx;
 
-import com.LT.restDummy.delay.model.DelayValue;
+//import com.LT.restDummy.delay.model.DelayValue;
+
+import com.LT.restDummy.servises.ServiceValue;
 import lombok.NonNull;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
@@ -43,7 +45,7 @@ public class InfluxWriter {
                 .tag("Chanel", influxConnect.getChanel())
                 .tag("operationName", operationName)
                 .tag("operationNameIncome", operationName)
-                .addField("timeDelay", String.valueOf(DelayValue.getInstance().getDelayByService(operationName))).build();
+                .addField("timeDelay", String.valueOf(ServiceValue.getInstance().getDelayByService(operationName))).build();
         influxDB.write(influxConnect.getDb(), influxConnect.getRetentionPolicy(), point);
     }
 }

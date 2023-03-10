@@ -1,23 +1,19 @@
 package com.LT.restDummy.helper;
 
-import com.LT.restDummy.availability.model.AvailabilityValue;
 import com.LT.restDummy.date.DateModule;
-import com.LT.restDummy.delay.model.DelayValue;
-import com.LT.restDummy.delay.service.ResponseDelay;
 import com.LT.restDummy.exception.ServiceException;
 import com.LT.restDummy.servises.Service;
 import com.LT.restDummy.servises.ServiceValue;
+import com.LT.restDummy.servises.ResponseDelay;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /*Класс помощник для работы с ответами сервисов*/
 @Slf4j
@@ -26,20 +22,22 @@ public class ResponseHelper {
     public static CompletableFuture<ResponseEntity<String>> returnResponse(String request, String serviceName,
                                                                            long delay,
                                                                            Boolean isAvailable) {
+//    TODO проверка на существование сервиса
+
         log.info("REQUEST: " + request);
         // Если параметры заданы, то обновляем их
         if (delay != 0) {
-            DelayValue.getInstance().setNewDelayToService(serviceName, delay);
+            ServiceValue.getInstance().setNewDelayToService(serviceName, delay);
         }
         if (isAvailable != null) {
-            AvailabilityValue.getInstance().setAvailabilityToService(serviceName, isAvailable);
+            ServiceValue.getInstance().setAvailabilityToService(serviceName, isAvailable);
         }
         // Если сервис доступен, то возвращаем его
-        if (AvailabilityValue.getInstance().getAvailabilityByService(serviceName)) {
+        if (ServiceValue.getInstance().getAvailabilityByService(serviceName)) {
 //            передаем параметры для задержки: секунды, закорелированный ответ и сервис
-            return ResponseDelay.scheduleResponse(DelayValue.getInstance().getDelayByService(serviceName),
+            return ResponseDelay.scheduleResponse(ServiceValue.getInstance().getDelayByService(serviceName),
                     responseCorrelate(request,
-                            getResponseByPercent(ServiceValue.getInstance().getService(serviceName)),
+                            getResponseByPercent(ServiceValue.getInstance().getServiceByName(serviceName)),
                             ServiceValue.getInstance().getTypeByService(serviceName)),
                     serviceName);
         } else throw new ServiceException("Сервис временно недоступен. Включите заглушку");

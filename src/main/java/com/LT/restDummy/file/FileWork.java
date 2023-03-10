@@ -1,6 +1,7 @@
 package com.LT.restDummy.file;
 
 import com.LT.restDummy.servises.Service;
+import com.LT.restDummy.servises.ServiceValue;
 import com.google.common.io.Files;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class FileWork {
 
     }
 
-    public static Service getService(String content) {
+    public static Service getService(String content, String name) {
         Service service = new Service();
         ConcurrentHashMap<Integer, String> map = new ConcurrentHashMap<>();
 
@@ -80,8 +81,13 @@ public class FileWork {
         }
 
         service.setResponse(map);
-
-        if (service.isPercentage()){
+        service.setType(getContentType(content));
+        service.setName(name);
+        service.setDefaultDelay(getContentDelay(content));
+        service.setCurrentDelay(getContentDelay(content));
+        service.setTimeout(getContentTimeout(content));
+        service.setDelayForScheduler(ServiceValue.calculateMinus10PercentDelay(service.getTimeout()));
+        if (service.isPercentage()) {
             service.setThresholds(service.getResponse().keySet().stream().sorted().collect(Collectors.toList()));
         }
         return service;

@@ -1,31 +1,36 @@
-package com.LT.restDummy.delay.model;
+package com.LT.restDummy.servises;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /*Необходим для отображения через GUI*/
-public class ViewDelayDataDTO {
-    private List<ViewDelayData> viewData;
+@Getter
+@Setter
+public class ViewServiceDataDTO {
+    private List<ViewServiceData> viewData;
 
-    public ViewDelayDataDTO() {
+    public ViewServiceDataDTO() {
         this.viewData = new ArrayList<>();
     }
 
     //    Не удалять. Без него ломается HTML
-    public ViewDelayDataDTO(List<ViewDelayData> viewData) {
+    public ViewServiceDataDTO(List<ViewServiceData> viewData) {
         this.viewData = viewData;
     }
 
-    public void addViewDelayData(ViewDelayData data) {
+    public void addViewServiceData(ViewServiceData data) {
         this.viewData.add(data);
     }
 
-    public List<ViewDelayData> getViewData() {
+    public List<ViewServiceData> getViewService() {
         return viewData;
     }
 
     //    Не удалять. Без него ломается HTML
-    public void setViewData(List<ViewDelayData> viewData) {
+    public void setViewData(List<ViewServiceData> viewData) {
         this.viewData = viewData;
     }
 }

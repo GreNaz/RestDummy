@@ -14,7 +14,7 @@
 
 <body class="py-4">
 <div class="delay-table">
-    <form id='myForm' action="#" th:object="${viewServiceData}" method="post">
+    <form id='myForm' action="#" th:object="${viewServiceNewData}" method="post">
         <table class="table">
             <thead class="thead-dark">
             <tr>
@@ -27,7 +27,7 @@
                 <td>
                     <input type="text" class="form-control form-addSrv"
                            th:name="ServiceName"
-                           th:value="${viewServiceData.getServiceName()}" placeholder='NewService'/>
+                           th:value="${viewServiceNewData.getServiceName()}" placeholder='NewService'/>
 
                     <div class="text-grey"> <br> Чтобы отредактировать текущий текст сервиса - введите только название
                         нужного сервиса и нажмите кнопку "Хочу текст файла".</div>
@@ -35,7 +35,7 @@
                 <td>
                     <textarea class="form-control form-addSrv" rows="21"
                               th:name="Content"
-                              th:text="${viewServiceData.getContent()}" placeholder='{
+                              th:text="${viewServiceNewData.getContent()}" placeholder='{
     "rqUid": "__rqUid__",
     "rqTm": "__rqTm__",
     "operUid": "ccc147cfbbe14934a2b470bb0afa20f4",
