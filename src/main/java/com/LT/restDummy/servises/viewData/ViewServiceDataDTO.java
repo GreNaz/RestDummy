@@ -1,4 +1,4 @@
-package com.LT.restDummy.servises;
+package com.LT.restDummy.servises.viewData;
 
 import lombok.Getter;
 import lombok.Setter;

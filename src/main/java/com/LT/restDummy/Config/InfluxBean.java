@@ -13,7 +13,9 @@ import org.springframework.context.annotation.PropertySource;
 
 import java.util.concurrent.TimeUnit;
 
-/*Класс создает бины для инфлюкса*/
+/*
+Класс создает бины для инфлюкса
+*/
 @Configuration
 @PropertySource("classpath:/influxDB.properties")
 @Slf4j
@@ -22,11 +24,12 @@ public class InfluxBean {
     @Bean("InfluxDB")
     public InfluxDB influxdbFactory(@Value("${influxdb.connect.url}") String url,
                                     @Value("${influxdb.username}") String username,
+                                    @Value("${influxdb.password}") String password,
                                     @Value("${influxdb.batch.byCount}") int actions,
                                     @Value("${influxdb.batch.byTimeInMs}") int flush) {
         InfluxDBFactory factory;
         factory = InfluxDBFactory.INSTANCE;
-        InfluxDB influxDB = factory.connect(url, username, username);
+        InfluxDB influxDB = factory.connect(url, username, password);
         influxDB.enableBatch(actions, flush, TimeUnit.MILLISECONDS);
         return influxDB;
     }

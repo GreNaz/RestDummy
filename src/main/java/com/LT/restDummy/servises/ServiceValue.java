@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,9 @@ public class ServiceValue {
         static final ServiceValue HOLDER_INSTANCE = new ServiceValue();
     }
 
-    //        необходимо для использования нестатической переменной в статическом методе
+    /*
+         необходимо для использования нестатической переменной в статическом методе
+    */
     public static ServiceValue getInstance() {
         return ServiceValue.ServiceValueNewHolder.HOLDER_INSTANCE;
     }
@@ -41,6 +44,9 @@ public class ServiceValue {
         return services;
     }
 
+    public Collection<Service> getServicesArray() {
+        return services.values();
+    }
 
     public Service getServiceByName(String serviceName) {
         return services.getOrDefault(serviceName, null);
@@ -50,12 +56,16 @@ public class ServiceValue {
         services.put(serviceName, service);
     }
 
-    public void setResponseByService(String serviceName, Service service) {
-        services.put(serviceName, service);
+
+    public void updateService(Service updatingService) {
+        Service service = services.get(updatingService.getName());
+        service.setCurrentDelay(updatingService.getCurrentDelay());
+        service.setAvailable(updatingService.isAvailable());
     }
 
-
-    //    AVAILABILITY
+    /*
+            AVAILABILITY
+    */
     public boolean getAvailabilityByService(@NonNull String serviceName) {
         return services.get(serviceName).isAvailable();
     }
@@ -74,18 +84,14 @@ public class ServiceValue {
         }
     }
 
-    public void setDefaultSchedulerForAvailability(@NonNull String serviceName) {
-        services.get(serviceName).setAvailabilityScheduler(LocalDateTime.of(2000, 01, 01, 01, 01));
-
-    }
-
     public void setSchedulerForAvailabilityToService(@NonNull String serviceName, @NonNull LocalDateTime scheduler) {
         services.get(serviceName).setAvailabilityScheduler(scheduler);
     }
 
 
-//    DELAY
-
+    /*
+        DELAY
+    */
     public long getDelayByService(@NonNull String serviceName) {
         return services.get(serviceName).getCurrentDelay();
     }
@@ -116,16 +122,19 @@ public class ServiceValue {
         return services.get(serviceName).getSchedulerToDelay();
     }
 
-    //    возвращать задержку для шедуллера
+    /*
+            возвращать задержку для шедуллера
+    */
     public long getDelayForSchedulerByService(@NonNull String serviceName) {
         return services.get(serviceName).getDelayForScheduler();
     }
 
 
-    //    выставлять задержку для шедуллера
+    /*
+            выставлять задержку для шедуллера
+    */
     public void setNewDelayToScheduler(@NonNull String serviceName, @NonNull long valueOfDelay) {
         if (services.containsKey(serviceName)
-//                && services.get(serviceName). >= 0
         ) {
             services.get(serviceName).setDelayForScheduler(valueOfDelay);
         } else {
@@ -140,7 +149,9 @@ public class ServiceValue {
             log.error("Cant set new value for '{}', service not found", serviceName);
     }
 
-    //    ставит задержку -10% от таймаута. Если таймаут не задан, то оставляет задержку как есть.
+    /*
+            ставит задержку -10% от таймаута. Если таймаут не задан, то оставляет задержку как есть.
+    */
     public void setMinus10PercentDelay() {
         for (Service service : services.values()) {
             if (service.getTimeout() > 0) {

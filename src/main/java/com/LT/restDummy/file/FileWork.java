@@ -18,7 +18,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/*Класс для работы с файлами и данными из файлов*/
+/*
+Класс для работы с файлами и данными из файлов
+*/
 @Slf4j
 public class FileWork {
 
@@ -28,7 +30,6 @@ public class FileWork {
         File directory = new File("services");
         File file = new File(directory, fileName);
         byte[] strToBytes = content.getBytes();
-
         Files.write(strToBytes, file);
     }
 
@@ -79,7 +80,6 @@ public class FileWork {
                 }
             }
         }
-
         service.setResponse(map);
         service.setType(getContentType(content));
         service.setName(name);
@@ -140,7 +140,9 @@ public class FileWork {
         return arrayList;
     }
 
-    //    Вытаскиваем сабсистем или создаем файл-уведомление
+/*
+        Вытаскиваем сабсистем или создаем файл-уведомление
+*/
     public static Properties getInfluxProperty() {
         Properties properties = new Properties();
         try {

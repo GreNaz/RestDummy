@@ -1,6 +1,7 @@
 package com.LT.restDummy.servises;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Service {
     private String name;
     //    Ключ - число для процентного распределения
@@ -26,4 +28,9 @@ public class Service {
     private Long DelayForScheduler;
     private String type;
 
+    public Service(String name, Long delay, boolean available) {
+        this.name = name;
+        this.currentDelay = delay;
+        this.available = available;
+    }
 }

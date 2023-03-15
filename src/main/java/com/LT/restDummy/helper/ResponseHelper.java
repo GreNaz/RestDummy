@@ -2,39 +2,48 @@ package com.LT.restDummy.helper;
 
 import com.LT.restDummy.date.DateModule;
 import com.LT.restDummy.exception.ServiceException;
-import com.LT.restDummy.servises.Service;
-import com.LT.restDummy.servises.ServiceValue;
-import com.LT.restDummy.servises.ResponseDelay;
+import com.LT.restDummy.servises.*;
+import com.LT.restDummy.servises.dto.ServiceRequestDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONObject;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-/*Класс помощник для работы с ответами сервисов*/
+/*
+Класс помощник для работы с ответами сервисов
+*/
 @Slf4j
 public class ResponseHelper {
 
     public static CompletableFuture<ResponseEntity<String>> returnResponse(String request, String serviceName,
                                                                            long delay,
                                                                            Boolean isAvailable) {
-//    TODO проверка на существование сервиса
-
         log.info("REQUEST: " + request);
-        // Если параметры заданы, то обновляем их
+
+/*
+         Если параметры заданы, то обновляем их
+*/
         if (delay != 0) {
             ServiceValue.getInstance().setNewDelayToService(serviceName, delay);
         }
         if (isAvailable != null) {
             ServiceValue.getInstance().setAvailabilityToService(serviceName, isAvailable);
         }
-        // Если сервис доступен, то возвращаем его
+/*
+         Если сервис доступен, то возвращаем его
+*/
         if (ServiceValue.getInstance().getAvailabilityByService(serviceName)) {
-//            передаем параметры для задержки: секунды, закорелированный ответ и сервис
+/*
+            передаем параметры для задержки: секунды, закорелированный ответ и сервис
+*/
             return ResponseDelay.scheduleResponse(ServiceValue.getInstance().getDelayByService(serviceName),
                     responseCorrelate(request,
                             getResponseByPercent(ServiceValue.getInstance().getServiceByName(serviceName)),
@@ -44,7 +53,9 @@ public class ResponseHelper {
     }
 
 
-    //    Сортирует пороговые значения ответов по возрастанию, если рандомное число попадает в порог то отправляем ответ закрепленный за порогом
+/*
+        Сортирует пороговые значения ответов по возрастанию, если рандомное число попадает в порог то отправляем ответ закрепленный за порогом
+*/
     public static String getResponseByPercent(Service service) {
         int rand = 1 + (int) (Math.random() * 100);
         if (service.isPercentage()) {
@@ -73,7 +84,9 @@ public class ResponseHelper {
 
 
     public static String responseCorrelate(String request, String response, String type) {
-//       собираем все параметры, необходимые к замене
+/*
+       собираем все параметры, необходимые к замене
+*/
         Matcher matcher = Pattern.compile("__([a-zA-Z0-9]+)__").matcher(response);
         ArrayList<String> params = new ArrayList<>();
         while (matcher.find()) {
@@ -82,7 +95,9 @@ public class ResponseHelper {
 
         Pattern patternResponse;
         for (String param : params) {
-//            Собираем подстроку которую нужно будет заменить в ответе. Пример: __RqUID__
+/*
+            Собираем подстроку которую нужно будет заменить в ответе. Пример: __RqUID__
+*/
             switch (type) {
                 case "xml":
                     patternResponse = Pattern.compile("<" + param + ">(__[a-zA-Z0-9]*__)<");
@@ -94,7 +109,9 @@ public class ResponseHelper {
             }
             Matcher matcherResponse = patternResponse.matcher(response);
             while (matcherResponse.find()) {
-//            Заменяем найденную подстроку на значение из запроса или текущее время
+/*
+            Заменяем найденную подстроку на значение из запроса или текущее время
+*/
                 if (param.equalsIgnoreCase("rqtm") || param.equalsIgnoreCase("rstm")) {
                     response = StringUtils.replace(response, matcherResponse.group(1), DateModule.get_date_now());
                 } else {
@@ -105,5 +122,24 @@ public class ResponseHelper {
         return response;
     }
 
+
+    public static JSONObject getServices() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("success", true);
+        jsonObject.put("services", ServiceValue.getInstance().getServicesArray().
+                stream().map(service -> ServiceMapper.serviceToDto(service))
+                .collect(Collectors.toList()));
+        return jsonObject;
+    }
+
+    public static JSONObject editServices(List<ServiceRequestDto> services) {
+        for (ServiceRequestDto dtoService : services) {
+            ServiceValue.getInstance().updateService(ServiceMapper.dtoToService(dtoService));
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("success", true);
+        return jsonObject;
+
+    }
 
 }

@@ -2,9 +2,9 @@ package com.LT.restDummy.controller;
 
 import com.LT.restDummy.file.FileWork;
 import com.LT.restDummy.servises.ServiceValue;
-import com.LT.restDummy.servises.ViewServiceData;
-import com.LT.restDummy.servises.ViewServiceDataDTO;
-import com.LT.restDummy.servises.ViewServiceNewData;
+import com.LT.restDummy.servises.viewData.ViewServiceData;
+import com.LT.restDummy.servises.viewData.ViewServiceDataDTO;
+import com.LT.restDummy.servises.viewData.ViewServiceNewData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,37 +18,41 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-/*Класс взаимодействует с фронтом(html) и управляет задержкой и доступностью сервисов*/
+/*
+Класс взаимодействует с фронтом(html) и управляет задержкой и доступностью сервисов
+*/
 @Slf4j
 @Controller
 public class DelayController {
     protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-    //    private final DelayValue delayValue;
     private final ServiceValue serviceValue;
 
     @Autowired
-    public DelayController(
-//            DelayValue delayValue,
-            ServiceValue serviceValue) {
-//        this.delayValue = delayValue;
+    public DelayController(ServiceValue serviceValue) {
         this.serviceValue = serviceValue;
     }
 
-    //  страница с информацией по доступности сервиса, задержке и таймаутам
+/*
+      страница с информацией по доступности сервиса, задержке и таймаутам
+*/
     @GetMapping("/delay")
     public String showNewDelayForm(Model model) {
         getForm(model);
         return "delay";
     }
 
-    //  страница редактирования доступности сервиса и задержки
+/*
+      страница редактирования доступности сервиса и задержки
+*/
     @GetMapping(value = "/delay/edit")
     public String editDelayForm(Model model) {
         getForm(model);
         return "edit";
     }
 
-    //    сохранение информации после редактирования
+/*
+        сохранение информации после редактирования
+*/
     @RequestMapping(value = "/delay/save")
     public String saveEditForm(@ModelAttribute(name = "form") ViewServiceDataDTO viewData, Model model) {
         for (ViewServiceData service : viewData.getViewData()) {
@@ -61,28 +65,36 @@ public class DelayController {
         return "redirect:/delay";
     }
 
-    //  ставит отклик -10% от таймаута
+/*
+      ставит отклик -10% от таймаута
+*/
     @RequestMapping("/delay/calculate")
     public String calculateDelaySet() {
         serviceValue.setMinus10PercentDelay();
         return "redirect:/delay";
     }
 
-    //    вернуть дефолтные задержки
+/*
+        вернуть дефолтные задержки
+*/
     @RequestMapping("/delay/default")
     public String defaultDelaySet() {
         serviceValue.setDefaultDelayForAllService();
         return "redirect:/delay";
     }
 
-    //    включить все сервисы
+/*
+        включить все сервисы
+*/
     @RequestMapping("/delay/enableServices")
     public String enableServices() {
         serviceValue.setAvailabilityToAllService(true);
         return "redirect:/delay";
     }
 
-    //    выключить все сервисы
+/*
+        выключить все сервисы
+*/
     @RequestMapping("/delay/disableServices")
     public String disableServices() {
         serviceValue.setAvailabilityToAllService(false);
@@ -96,7 +108,9 @@ public class DelayController {
         return "newServices";
     }
 
-    //    Сохранение сервиса. Если есть параметр эндпоинта, то он становится именем сервиса(но не файла)
+/*
+        Сохранение сервиса. Если есть параметр эндпоинта, то он становится именем сервиса(но не файла)
+*/
     @RequestMapping(value = "/services/save")
     public String saveAddForm(@ModelAttribute(name = "viewServiceData") ViewServiceNewData viewData, Model model) {
         String ServiceNameOrEndpoint = FileWork.getContentEndPoint(viewData.getContent());
@@ -104,7 +118,6 @@ public class DelayController {
         if (ServiceNameOrEndpoint == null) {
             ServiceNameOrEndpoint = viewData.getServiceName();
         }
-
         serviceValue.setService(ServiceNameOrEndpoint,
                 FileWork.getService(viewData.getContent(), viewData.getServiceName()));
         return "redirect:/delay";
