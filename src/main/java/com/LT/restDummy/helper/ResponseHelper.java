@@ -2,13 +2,17 @@ package com.LT.restDummy.helper;
 
 import com.LT.restDummy.date.DateModule;
 import com.LT.restDummy.exception.ServiceException;
-import com.LT.restDummy.servises.*;
+import com.LT.restDummy.servises.ResponseDelay;
+import com.LT.restDummy.servises.Service;
+import com.LT.restDummy.servises.ServiceMapper;
+import com.LT.restDummy.servises.ServiceValue;
 import com.LT.restDummy.servises.dto.ServiceRequestDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.springframework.http.ResponseEntity;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -22,6 +26,12 @@ import java.util.stream.Collectors;
 */
 @Slf4j
 public class ResponseHelper {
+    private static final String CHAR_LOWER = "abcdefghijklmnopqrstuvwxyz";
+    private static final String CHAR_UPPER = CHAR_LOWER.toUpperCase();
+    private static final String NUMBER = "0123456789";
+    private static final String DATA_FOR_RANDOM_STRING_NUMBER = CHAR_LOWER + CHAR_UPPER + NUMBER;
+    private static final String DATA_FOR_RANDOM_STRING = CHAR_LOWER + CHAR_UPPER;
+    private static SecureRandom random = new SecureRandom();
 
     public static CompletableFuture<ResponseEntity<String>> returnResponse(String request, String serviceName,
                                                                            long delay,
@@ -42,7 +52,7 @@ public class ResponseHelper {
 */
         if (ServiceValue.getInstance().getAvailabilityByService(serviceName)) {
 /*
-            передаем параметры для задержки: секунды, закорелированный ответ и сервис
+            передаем параметры для задержки: секунды, закоррелированный ответ и сервис
 */
             return ResponseDelay.scheduleResponse(ServiceValue.getInstance().getDelayByService(serviceName),
                     responseCorrelate(request,
@@ -53,9 +63,9 @@ public class ResponseHelper {
     }
 
 
-/*
-        Сортирует пороговые значения ответов по возрастанию, если рандомное число попадает в порог то отправляем ответ закрепленный за порогом
-*/
+    /*
+            Сортирует пороговые значения ответов по возрастанию, если рандомное число попадает в порог то отправляем ответ закрепленный за порогом
+    */
     public static String getResponseByPercent(Service service) {
         int rand = 1 + (int) (Math.random() * 100);
         if (service.isPercentage()) {
@@ -83,11 +93,46 @@ public class ResponseHelper {
     }
 
 
+    public static String randomNumberAndChar(int length) {
+        if (length < 1) throw new IllegalArgumentException();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int rndCharAt = random.nextInt(DATA_FOR_RANDOM_STRING_NUMBER.length());
+            char rndChar = DATA_FOR_RANDOM_STRING_NUMBER.charAt(rndCharAt);
+            sb.append(rndChar);
+        }
+        return sb.toString();
+
+    }
+
+    public static String randomNumber(int length) {
+        if (length < 1) throw new IllegalArgumentException();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int rndCharAt = random.nextInt(NUMBER.length());
+            char rndChar = NUMBER.charAt(rndCharAt);
+            sb.append(rndChar);
+        }
+        return sb.toString();
+    }
+
+    public static String randomChar(int length) {
+        if (length < 1) throw new IllegalArgumentException();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int rndCharAt = random.nextInt(DATA_FOR_RANDOM_STRING.length());
+            char rndChar = DATA_FOR_RANDOM_STRING.charAt(rndCharAt);
+            sb.append(rndChar);
+        }
+        log.info(sb.toString());
+        return sb.toString();
+    }
+
     public static String responseCorrelate(String request, String response, String type) {
 /*
        собираем все параметры, необходимые к замене
 */
-        Matcher matcher = Pattern.compile("__([a-zA-Z0-9]+)__").matcher(response);
+        Matcher matcher = Pattern.compile("__([a-zA-Z0-9<>]+)__").matcher(response);
         ArrayList<String> params = new ArrayList<>();
         while (matcher.find()) {
             params.add(matcher.group(1));
@@ -95,6 +140,21 @@ public class ResponseHelper {
 
         Pattern patternResponse;
         for (String param : params) {
+/*
+            Заменяем найденную подстроку на значение из запроса или текущее время
+*/
+            if (param.equalsIgnoreCase("rqtm") || param.equalsIgnoreCase("rstm")) {
+                response = StringUtils.replace(response, "__" + param + "__", DateModule.get_date_now());
+            } else if (param.toLowerCase(Locale.ROOT).contains("rndnumchar")) {
+                int num = Integer.parseInt(StringUtils.substringBetween(param, "<", ">"));
+                response = StringUtils.replace(response, "__" + param + "__", randomNumberAndChar(num));
+            } else if (param.toLowerCase(Locale.ROOT).contains("rndnum")) {
+                int num = Integer.parseInt(StringUtils.substringBetween(param, "<", ">"));
+                response = StringUtils.replace(response, "__" + param + "__", randomNumber(num));
+            } else if (param.toLowerCase(Locale.ROOT).contains("rndchar")) {
+                int num = Integer.parseInt(StringUtils.substringBetween(param, "<", ">"));
+                response = StringUtils.replace(response, "__" + param + "__", randomChar(num));
+            }
 /*
             Собираем подстроку которую нужно будет заменить в ответе. Пример: __RqUID__
 */
@@ -109,14 +169,7 @@ public class ResponseHelper {
             }
             Matcher matcherResponse = patternResponse.matcher(response);
             while (matcherResponse.find()) {
-/*
-            Заменяем найденную подстроку на значение из запроса или текущее время
-*/
-                if (param.equalsIgnoreCase("rqtm") || param.equalsIgnoreCase("rstm")) {
-                    response = StringUtils.replace(response, matcherResponse.group(1), DateModule.get_date_now());
-                } else {
-                    response = StringUtils.replace(response, matcherResponse.group(1), parameterCorrelate(request, param, type));
-                }
+                response = StringUtils.replace(response, matcherResponse.group(1), parameterCorrelate(request, param, type));
             }
         }
         return response;
@@ -127,7 +180,7 @@ public class ResponseHelper {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("success", true);
         jsonObject.put("services", ServiceValue.getInstance().getServicesArray().
-                stream().map(service -> ServiceMapper.serviceToDto(service))
+                stream().map(ServiceMapper::serviceToDto)
                 .collect(Collectors.toList()));
         return jsonObject;
     }
