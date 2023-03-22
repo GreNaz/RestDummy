@@ -1,6 +1,8 @@
 package com.LT.restDummy.influx;
 
-import com.LT.restDummy.delay.model.DelayValue;
+//import com.LT.restDummy.delay.model.DelayValue;
+
+import com.LT.restDummy.servises.ServiceValue;
 import lombok.NonNull;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
@@ -9,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.TimeUnit;
 
-/*Пишет в инфлюкс*/
+/*
+Пишет в инфлюкс
+*/
 public class InfluxWriter {
     @Autowired
     private InfluxDB influxDB;
@@ -35,7 +39,6 @@ public class InfluxWriter {
 
     public void addPoint(@NonNull String operationName) {
         long timestamp = System.currentTimeMillis();
-
         Point point = Point.measurement(influxConnect.getSubsystem())
                 .time(timestamp, TimeUnit.MILLISECONDS)
                 .tag("Application", influxConnect.getSubsystem())
@@ -43,7 +46,7 @@ public class InfluxWriter {
                 .tag("Chanel", influxConnect.getChanel())
                 .tag("operationName", operationName)
                 .tag("operationNameIncome", operationName)
-                .addField("timeDelay", String.valueOf(DelayValue.getInstance().getDelayByService(operationName))).build();
+                .addField("timeDelay", String.valueOf(ServiceValue.getInstance().getDelayByService(operationName))).build();
         influxDB.write(influxConnect.getDb(), influxConnect.getRetentionPolicy(), point);
     }
 }

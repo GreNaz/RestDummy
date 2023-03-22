@@ -1,13 +1,13 @@
-package com.LT.restDummy.delay.model;
+package com.LT.restDummy.servises.viewData;
+
+///*Необходим для отображения через GUI*/
 
 import lombok.Getter;
 import lombok.Setter;
 
-/*Необходим для отображения через GUI*/
 @Getter
 @Setter
-public class ViewDelayData {
-
+public class ViewServiceData {
     private String name;
     private Long currentDelay;
     private Long timeout;
@@ -16,7 +16,7 @@ public class ViewDelayData {
     private Boolean isAvailable;
     private String schedulerAvailability;
 
-    public ViewDelayData(String name, Long currentDelay, Long timeout, Long delayForScheduler, String schedulerDelay, Boolean isAvailable, String schedulerAvailability) {
+    public ViewServiceData(String name, Long currentDelay, Long timeout, Long delayForScheduler, String schedulerDelay, Boolean isAvailable, String schedulerAvailability) {
         this.name = name;
         this.currentDelay = currentDelay;
         this.timeout = timeout;
@@ -27,7 +27,7 @@ public class ViewDelayData {
     }
 
     //    Не удалять. Без него ломается HTML
-    public ViewDelayData() {
+    public ViewServiceData() {
         this.name = "rand";
         this.currentDelay = 0L;
         this.timeout = 0L;

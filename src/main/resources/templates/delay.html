@@ -23,7 +23,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="service, itemStat : ${form.viewData}">
+        <tr th:each="service, itemStat : ${form.viewService}">
             <td><span th:text="${service.name}">Сервис</span></td>
             <td><span th:text="${service.getCurrentDelay}">Задержка в мс</span></td>
             <td><span th:text="${service.timeout}">Timeout в мс</span></td>

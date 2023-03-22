@@ -1,7 +1,7 @@
 package com.LT.restDummy.scheduler;
 
-import com.LT.restDummy.availability.model.AvailabilityValue;
-import com.LT.restDummy.delay.model.DelayValue;
+import com.LT.restDummy.servises.Service;
+import com.LT.restDummy.servises.ServiceValue;
 import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -9,41 +9,48 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Map;
 
-/*Класс каждые 60с делает проверку текущего времени и времени задержки,
-если оно совпадает - выставляется задержка или выключается сервис*/
+/*
+Класс каждые 60с делает проверку текущего времени и времени задержки,
+если оно совпадает - выставляется задержка или выключается сервис
+*/
 @Component
 public class Scheduler {
     protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    ServiceValue serviceValue;
+
+    public Scheduler(ServiceValue serviceValue) {
+        this.serviceValue = serviceValue;
+    }
 
     @SneakyThrows
     @Scheduled(fixedRate = 60000) // как часто проверка(1 мин)
-    public static void schedulingAvailability() {
+    public void schedulingAvailability() {
         boolean isScheduledAvailability = false;
         LocalDateTime now = LocalDateTime.parse(LocalDateTime.now().format(DATE_TIME_FORMATTER), DATE_TIME_FORMATTER);
         HashMap<String, Boolean> servicesStop = new HashMap<>();
-
-/*            Проверка на соответствие текущего времени и времени остановки сервиса, если хоть один соответствует,
-            то он останавливается и время шедулится на 10минут*/
-        for (Map.Entry<String, LocalDateTime> entry : AvailabilityValue.getInstance().getSchedulers().entrySet()) {
-            if (entry.getValue().isEqual(now)) {
-                servicesStop.put(entry.getKey(), true);
+/*
+            Проверка на соответствие текущего времени и времени остановки сервиса, если хоть один соответствует,
+            то он останавливается и время шедулится на 10минут
+*/
+        for (Service service : serviceValue.getServices().values()) {
+            if (service.getAvailabilityScheduler().isEqual(now)) {
+                servicesStop.put(service.getName(), true);
                 isScheduledAvailability = true;
             } else {
-                servicesStop.put(entry.getKey(), false);
+                servicesStop.put(service.getName(), false);
             }
         }
         for (String service : servicesStop.keySet()) {
             if (servicesStop.get(service)) {
-                AvailabilityValue.getInstance().setAvailabilityToService(service, false);
+                serviceValue.setAvailabilityToService(service, false);
             }
         }
         if (isScheduledAvailability) {
             Thread.sleep(600000); // - 10 мин
             for (String service : servicesStop.keySet()) {
                 if (servicesStop.get(service)) {
-                    AvailabilityValue.getInstance().setAvailabilityToService(service, true);
+                    serviceValue.setAvailabilityToService(service, true);
                 }
             }
         }
@@ -51,31 +58,34 @@ public class Scheduler {
 
     @SneakyThrows
     @Scheduled(fixedRate = 60000) // как часто проверка(1 мин)
-    public static void schedulingDelay() {
+    public void schedulingDelay() {
         boolean isScheduledDelay = false;
         LocalDateTime now = LocalDateTime.parse(LocalDateTime.now().format(DATE_TIME_FORMATTER), DATE_TIME_FORMATTER);
         HashMap<String, Boolean> servicesDelay = new HashMap<>();
 
-/*            Проверка на соответствие текущего времени и времени остановки сервиса, если хоть один соответствует,
-            то он останавливается и время шедулится на 10минут*/
-        for (Map.Entry<String, LocalDateTime> entry : DelayValue.getInstance().getSchedulers().entrySet()) {
-            if (entry.getValue().isEqual(now)) {
-                servicesDelay.put(entry.getKey(), true);
+/*
+            Проверка на соответствие текущего времени и времени остановки сервиса, если хоть один соответствует,
+            то он останавливается и время шедулится на 10минут
+*/
+        for (Service service : serviceValue.getServices().values()) {
+            if (service.getSchedulerToDelay().isEqual(now)) {
+                servicesDelay.put(service.getName(), true);
                 isScheduledDelay = true;
             } else {
-                servicesDelay.put(entry.getKey(), false);
+                servicesDelay.put(service.getName(), false);
             }
         }
+
         for (String service : servicesDelay.keySet()) {
             if (servicesDelay.get(service)) {
-                DelayValue.getInstance().setNewDelayToService(service, DelayValue.getInstance().getSchedulerDelayByService(service));
+                serviceValue.setNewDelayToService(service, ServiceValue.getInstance().getDelayForSchedulerByService(service));
             }
         }
         if (isScheduledDelay) {
             Thread.sleep(600000); // - 10 мин
             for (String service : servicesDelay.keySet()) {
                 if (servicesDelay.get(service)) {
-                    DelayValue.getInstance().setNewDelayToService(service, DelayValue.getInstance().getServicesDefaultDelay().get(service));
+                    serviceValue.setNewDelayToService(service, ServiceValue.getInstance().getServiceDefaultDelay(service));
                 }
             }
         }

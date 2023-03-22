@@ -1,4 +1,4 @@
-package com.LT.restDummy.servises;
+package com.LT.restDummy.servises.viewData;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ViewServiceData {
+public class ViewServiceNewData {
     private String serviceName;
     private String content;
 
